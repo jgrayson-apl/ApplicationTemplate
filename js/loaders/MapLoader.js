@@ -22,9 +22,6 @@ class MapLoader extends Watchable {
   id;
   // MAP //
   map;
-  get map() {
-    return this.map;
-  }
   
   constructor(config) {
     super();
