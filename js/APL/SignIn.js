@@ -167,6 +167,9 @@ class SignIn extends HTMLElement {
           this.portalInfoUsername.innerHTML = this._portal.user.username;
           this.portalInfoName.innerHTML = this._portal.name;
 
+          //
+          // TODO: FIX THIS URL IF ENTERPRISE
+          //
           const organizationUrl = `https://${ this._portal.urlKey }.${ this._portal.customBaseUrl }/`;
           this.portalInfoUrl.innerHTML = organizationUrl;
           this.portalInfoUrl.href = organizationUrl;
@@ -196,6 +199,10 @@ class SignIn extends HTMLElement {
   userSignIn() {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
+
+        //const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
+        //esriId.getCredential(portalSharingURL);
+
         this._portal = new Portal({authMode: 'immediate'});
         this._portal.load().then(() => {
           this.updateUserUI().then(resolve);

@@ -84,41 +84,50 @@ class AppLoader extends Watchable {
           }).catch(reject);
 
         } else {
-          require(['esri/identity/IdentityManager'], (esriId) => {
+          require(['esri/identity/IdentityManager', 'esri/identity/OAuthInfo'], (esriId, OAuthInfo) => {
+
+            // SHARING URL //
+            const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
+            let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
 
             //
             // OAUTH //
             //
             if (this.app?.oauthappid) {
-              require(['esri/identity/OAuthInfo'], (OAuthInfo) => {
+              signInMessage = `Application created via OAuth. [ ${ (new Date()).toLocaleString() } ]`;
 
-                const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
-
-                // CONFIGURE OAUTH //
-                const oauthInfo = new OAuthInfo({portalUrl: esriConfig.portalUrl, appId: this.app.oauthappid, popup: true});
-                esriId.registerOAuthInfos([oauthInfo]);
-                esriId.checkSignInStatus(portalSharingURL).then(() => {
-                  esriId.getCredential(portalSharingURL);
-                }).catch(() => {
-                  /* ... */
-                }).then(() => {
-                  // LOAD PORTAL //
-                  this._loadPortal({authMode: 'immediate'}).then(() => {
-                    resolve(`Application created via OAuth. [ ${ (new Date()).toLocaleString() } ]`);
-                  }).catch(reject);
-                })
-
+              // CONFIGURE OAUTH //
+              const oauthInfo = new OAuthInfo({
+                portalUrl: esriConfig.portalUrl,
+                appId: this.app.oauthappid,
+                popup: true
               });
+              esriId.registerOAuthInfos([oauthInfo]);
 
-            } else {
-              //
-              // NO CONFIGURED AUTHENTICATION //
-              //
-              // LOAD PORTAL //
-              this._loadPortal().then(() => {
-                resolve(`Application created on ${ (new Date()).toLocaleString() }`);
-              }).catch(reject);
             }
+
+            // CHECK SIGNIN STATUS //
+            esriId.checkSignInStatus(portalSharingURL).then(() => {
+              esriId.getCredential(portalSharingURL);
+            }).catch(() => {
+              /* ... */
+            }).then(() => {
+              // LOAD PORTAL //
+              // authMode: 'immediate'
+              this._loadPortal().then(() => {
+                resolve(signInMessage);
+              }).catch(reject);
+            });
+
+            /*else {
+             //
+             // NO CONFIGURED AUTHENTICATION //
+             //
+             // LOAD PORTAL //
+             this._loadPortal().then(() => {
+             resolve(`Application created on ${ (new Date()).toLocaleString() }`);
+             }).catch(reject);
+             }*/
           });
         }
       });
