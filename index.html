@@ -67,8 +67,8 @@
       <calcite-shell-panel slot="primary-panel" position="start" width-scale="m" collapsed="true">
         
         <calcite-action-bar id="side-panel-action-bar" slot="action-bar">
-          <calcite-action text="Layers" icon="layers" class="toggle-action" data-toggle="layer-list"></calcite-action>
-          <calcite-action text="Features" icon="list" class="toggle-action" data-toggle="features-list" hidden></calcite-action>
+          <calcite-action text="Layers" title="map layers" icon="layers" class="toggle-action" data-toggle="layer-list"></calcite-action>
+          <calcite-action text="Features" title="list of features" icon="list" class="toggle-action" data-toggle="features-list" hidden></calcite-action>
         </calcite-action-bar>
         
         <calcite-panel class="toggle-panel" data-toggle="layer-list" hidden>
@@ -91,21 +91,22 @@
       </calcite-shell-panel>
       
       <!-- CENTER -->
-      <!--<calcite-shell-center-row position="start" slot="center-row" height-scale="l">-->
-        <div id="center-container" class="content-col content-fill">
-          <div id="view-container">
-            <calcite-loader id="view-updating" type="indeterminate" scale="s"></calcite-loader>
-          </div>
-          <div class="content-static">
-            <calcite-panel id="bottom-container"></calcite-panel>
-          </div>
+      <div id="center-container" class="content-col content-fill">
+        <div id="view-container">
+          <calcite-loader id="view-updating" type="indeterminate" scale="s"></calcite-loader>
         </div>
-      <!--</calcite-shell-center-row>-->
+      </div>
+      
+      <!-- CENTER BOTTOM -->
+      <calcite-shell-center-row slot="center-row" position="start">
+        <calcite-panel id="bottom-container"></calcite-panel>
+      </calcite-shell-center-row>
       
       <!-- RIGHT -->
       <calcite-shell-panel slot="contextual-panel" position="end" width-scale="m" collapsed="true">
         <calcite-action-bar slot="action-bar">
           <calcite-action text="Analysis" icon="analysis" class="toggle-action" data-toggle="analysis"></calcite-action>
+          <calcite-action text="Results" icon="list" class="toggle-action" data-toggle="results"></calcite-action>
         </calcite-action-bar>
         
         <calcite-panel class="toggle-panel" data-toggle="analysis" hidden>
@@ -126,7 +127,31 @@
             </calcite-block-section>
           </calcite-block>
         </calcite-panel>
-      
+        
+        <calcite-panel class="toggle-panel" data-toggle="results" hidden>
+          <div slot="header-content">Results</div>
+          <div slot="header-actions-end">
+            <calcite-action icon="x" title="close panel" class="toggle-close" data-toggle="analysis"></calcite-action>
+          </div>
+          
+          <calcite-tabs class="margin-m">
+            <calcite-tab-nav slot="tab-nav">
+              <calcite-tab-title active>Boats</calcite-tab-title>
+              <calcite-tab-title>Ships</calcite-tab-title>
+              <calcite-tab-title>Yachts</calcite-tab-title>
+            </calcite-tab-nav>
+            <calcite-tab active>
+              Tab 1 content
+            </calcite-tab>
+            <calcite-tab>
+              Tab 2 content
+            </calcite-tab>
+            <calcite-tab>
+              Tab 3 content
+            </calcite-tab>
+          </calcite-tabs>
+        
+        </calcite-panel>
       </calcite-shell-panel>
       
       <!-- NOTICES ADN ALERTS -->
