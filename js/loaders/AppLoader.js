@@ -118,16 +118,6 @@ class AppLoader extends Watchable {
                 resolve(signInMessage);
               }).catch(reject);
             });
-
-            /*else {
-             //
-             // NO CONFIGURED AUTHENTICATION //
-             //
-             // LOAD PORTAL //
-             this._loadPortal().then(() => {
-             resolve(`Application created on ${ (new Date()).toLocaleString() }`);
-             }).catch(reject);
-             }*/
           });
         }
       });
