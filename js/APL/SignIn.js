@@ -37,13 +37,8 @@ class SignIn extends HTMLElement {
   constructor() {
     super();
 
-    this.userSignInDropdown = document.createElement('calcite-dropdown');
-    this.userSignInDropdown.classList.add('signIn-container');
-    this.userSignInDropdown.setAttribute('width', 'auto');
-    this.userSignInDropdown.setAttribute('type', 'click');
-    this.userSignInDropdown.toggleAttribute('hidden', true);
-
-    this.userSignInDropdown.innerHTML = `    
+    const shadowRoot = this.attachShadow({mode: 'open'})
+    shadowRoot.innerHTML = `
       <style>
        .signIn-container .signIn-username {
           margin-bottom: 4px; 
@@ -59,27 +54,28 @@ class SignIn extends HTMLElement {
        .signIn-container .signIn-portal-url{
         --calcite-ui-text-link: var(--calcite-ui-brand);
        }      
-      </style>          
-      <calcite-button class="signIn-status-btn" slot="dropdown-trigger" appearance="transparent" color="neutral" scale="m" icon-start="user" width="auto">        
-        not signed in
-      </calcite-button>        
-      <calcite-dropdown-group selection-mode="none">
-        <calcite-dropdown-item class="signIn-info">
-          <div style="display:flex;flex-direction:row;align-items:center;">        
-            <calcite-avatar class="signIn-avatar" scale="l" username="" thumbnail=""></calcite-avatar>
-            <div style="display:flex;flex-direction:column;padding-left:10px;">
-              <calcite-label class="signIn-username"></calcite-label>
-              <calcite-label class="signIn-portal-name"></calcite-label>
-              <calcite-link class="signIn-portal-url" target="_blank"></calcite-link>
+      </style>
+      
+      <calcite-dropdown class="signIn-container" width="auto" type="click">                
+        <calcite-button class="signIn-status-btn" slot="dropdown-trigger" appearance="transparent" color="neutral" scale="m" icon-start="user" width="auto">        
+          not signed in
+        </calcite-button>        
+        <calcite-dropdown-group selection-mode="none">
+          <calcite-dropdown-item class="signIn-info">
+            <div style="display:flex;flex-direction:row;align-items:center;">        
+              <calcite-avatar class="signIn-avatar" scale="l" username="" thumbnail=""></calcite-avatar>
+              <div style="display:flex;flex-direction:column;padding-left:10px;">
+                <calcite-label class="signIn-username"></calcite-label>
+                <calcite-label class="signIn-portal-name"></calcite-label>
+                <calcite-link class="signIn-portal-url" target="_blank"></calcite-link>
+              </div>
             </div>
-          </div>
-        </calcite-dropdown-item>
-      </calcite-dropdown-group>
-      <calcite-dropdown-item class="signIn-sign-in" icon-start="sign-in">Sign In</calcite-dropdown-item>
-      <calcite-dropdown-item class="signIn-sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
+          </calcite-dropdown-item>
+        </calcite-dropdown-group>
+        <calcite-dropdown-item class="signIn-sign-in" icon-start="sign-in">Sign In</calcite-dropdown-item>
+        <calcite-dropdown-item class="signIn-sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
+      </calcite-dropdown>
     `;
-
-    this.attachShadow({mode: 'open'}).appendChild(this.userSignInDropdown);
 
     // BIND METHODS //
     this.updateUserUI = this.updateUserUI.bind(this);
@@ -126,7 +122,6 @@ class SignIn extends HTMLElement {
 
         watchUtils.init(this._portal, 'user', (user) => {
           this.updateUserUI().then(() => {
-            user && this.userSignInDropdown && this.userSignInDropdown.removeAttribute('hidden');
             this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
           }).catch(this.displayError);
         });
@@ -137,6 +132,7 @@ class SignIn extends HTMLElement {
         });
 
       });
+
     } else {
       // this.userSignInItem && this.userSignInItem.removeEventListener('click', this.userSignIn);
       // this.userSignOutItem && this.userSignOutItem.removeEventListener('click', this.userSignOut);
@@ -167,9 +163,6 @@ class SignIn extends HTMLElement {
           this.portalInfoUsername.innerHTML = this._portal.user.username;
           this.portalInfoName.innerHTML = this._portal.name;
 
-          //
-          // TODO: FIX THIS URL IF ENTERPRISE
-          //
           const organizationUrl = `https://${ this._portal.urlKey }.${ this._portal.customBaseUrl }/`;
           this.portalInfoUrl.innerHTML = organizationUrl;
           this.portalInfoUrl.href = organizationUrl;
@@ -199,10 +192,6 @@ class SignIn extends HTMLElement {
   userSignIn() {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
-
-        //const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
-        //esriId.getCredential(portalSharingURL);
-
         this._portal = new Portal({authMode: 'immediate'});
         this._portal.load().then(() => {
           this.updateUserUI().then(resolve);
