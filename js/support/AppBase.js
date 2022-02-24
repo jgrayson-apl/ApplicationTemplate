@@ -249,6 +249,19 @@ class AppBase extends AppParameters {
 
   }
 
+  /**
+   * Example: setShadowElementStyle(diseaseInput, ".list-container", "maxHeight", "200px");
+   *
+   * @param {HTMLElement} ref
+   * @param {string} selector
+   * @param {string} rule
+   * @param {string} val
+   */
+  setShadowElementStyle(ref, selector, rule, val) {
+    const shadowDiv = ref.shadowRoot.querySelector(`${ selector }`);
+    if (shadowDiv && shadowDiv.style[rule] !== val) shadowDiv.style[rule] = val;
+  }
+
 }
 
 export default AppBase;
