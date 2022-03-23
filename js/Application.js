@@ -156,7 +156,7 @@ class Application extends AppBase {
    */
   displayFeatureList(view) {
     if (view) {
-      require(['esri/core/promiseUtils',], (promiseUtils) => {
+      require(['esri/core/promiseUtils'], (promiseUtils) => {
 
         // POPUP DOCKING OPTIONS //
         view.set({
