@@ -53,7 +53,7 @@
         
         <div class="content-row">
           
-          <div id="search-container"></div>
+          <div id="search-container" hidden></div>
           
           <apl-sign-in id="sign-in"></apl-sign-in>
           
@@ -96,7 +96,7 @@
             <calcite-action id="clear-list-selection-action" appearance="clear" scale="m" text-enabled="true" text="clear" title="clear selection"></calcite-action>
             <calcite-action icon="x" title="close panel" class="toggle-close" data-toggle="features-list"></calcite-action>
           </div>
-          <calcite-pick-list id="features-list" filter-enabled="true" loading="true" role="menu"></calcite-pick-list>
+          <calcite-pick-list id="features-list" filter-enabled="true" loading="true"></calcite-pick-list>
         </calcite-panel>
       
       </calcite-shell-panel>
@@ -194,16 +194,12 @@
       <calcite-pick-list-item
         label=""
         description=""
-        value=""
-        aria-checked="false"
-        role="menuitemcheckbox"
-        icon="circle"
-        disabled="false">
+        value="">
         <calcite-action
           slot="actions-end"
           label=""
-          appearance="clear"
           scale="s"
+          appearance="clear"
           icon="information">
         </calcite-action>
       </calcite-pick-list-item>
