@@ -108,12 +108,11 @@ class AppLoader extends Watchable {
 
             // CHECK SIGNIN STATUS //
             esriId.checkSignInStatus(portalSharingURL).then(() => {
-              esriId.getCredential(portalSharingURL);
+              return esriId.getCredential(portalSharingURL);
             }).catch(() => {
               /* ... */
             }).then(() => {
               // LOAD PORTAL //
-              // authMode: 'immediate'
               this._loadPortal().then(() => {
                 resolve(signInMessage);
               }).catch(reject);
@@ -135,7 +134,7 @@ class AppLoader extends Watchable {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
         // CREATE PORTAL //
-        const portal = new Portal({...params});
+        const portal = new Portal({authMode: this.app.authMode, ...params});
         // LOAD PORTAL //
         portal.load().then(() => {
           Promise.all([
@@ -203,7 +202,7 @@ class AppLoader extends Watchable {
 
         // https://stackoverflow.com/questions/286141/remove-blank-attributes-from-an-object-in-javascript
         const cleanParams = params => {
-          return Object.entries(params).reduce((a, [k, v]) => (v == null ? a : (a[k] = v, a)), {})
+          return Object.entries(params).reduce((a, [k, v]) => (v == null ? a : (a[k] = v, a)), {});
         };
 
         const center = this.app?.getParam('center')?.split(',') || null;

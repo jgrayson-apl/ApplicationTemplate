@@ -22,6 +22,9 @@ class Application extends AppBase {
   // PORTAL //
   portal;
 
+  // SIGN IN //
+  signIn;
+
   constructor() {
     super();
 
@@ -61,8 +64,8 @@ class Application extends AppBase {
   configUserSignIn() {
     if (this.oauthappid || this.portal?.user) {
 
-      const signIn = document.getElementById('sign-in');
-      signIn && (signIn.portal = this.portal);
+      this.signIn = document.getElementById('sign-in');
+      this.signIn && (this.signIn.portal = this.portal);
 
     }
   }
