@@ -1,5 +1,5 @@
 /*
- Copyright 2020 Esri
+ Copyright 2022 Esri
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -78,11 +78,12 @@ class Application extends AppBase {
     return new Promise((resolve, reject) => {
       if (view) {
         require([
+          'esri/core/reactiveUtils',
           'esri/widgets/Home',
           'esri/widgets/Search',
           'esri/widgets/LayerList',
           'esri/widgets/Legend'
-        ], (Home, Search, LayerList, Legend) => {
+        ], (reactiveUtils, Home, Search, LayerList, Legend) => {
 
           //
           // CONFIGURE VIEW SPECIFIC STUFF HERE //
@@ -122,7 +123,7 @@ class Application extends AppBase {
           this.disableViewUpdating = false;
           const viewUpdating = document.getElementById('view-updating');
           view.ui.add(viewUpdating, 'bottom-right');
-          this._watchUtils.init(view, 'updating', updating => {
+          reactiveUtils.watch(() => view.updating, (updating) => {
             (!this.disableViewUpdating) && viewUpdating.toggleAttribute('active', updating);
           });
 
@@ -173,7 +174,7 @@ class Application extends AppBase {
           }
         });
 
-        const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'})
+        const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
         const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
 
         const layerInfo = {
@@ -188,7 +189,7 @@ class Application extends AppBase {
             label: f => `${ f.attributes.IncidentName }`,
             description: f => `${ dateFormatter.format(new Date(f.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(f.attributes.GISAcres) }`
           }
-        }
+        };
 
         // FEATURE LAYER //
         const featureLayer = view.map.allLayers.find(layer => layer.title === layerInfo.title);
@@ -236,7 +237,7 @@ class Application extends AppBase {
             // UPDATE LIST SELECTION //
             const updateListSelection = (featureOID) => {
               if (featureOID) {
-                const featureItem = featuresList.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`)
+                const featureItem = featuresList.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
                 featureItem && (featureItem.selected = true);
               } else {
                 featuresList.getSelectedItems().then((selectedItems) => {
@@ -271,7 +272,7 @@ class Application extends AppBase {
                   view.popup.open({features: [feature]});
                 });
               });
-            }
+            };
 
             // CLEAR LIST SELECTION //
             const clearListSelectionAction = document.getElementById('clear-list-selection-action');

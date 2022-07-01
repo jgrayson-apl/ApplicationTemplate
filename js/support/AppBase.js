@@ -1,5 +1,5 @@
 /*
- Copyright 2020 Esri
+ Copyright 2022 Esri
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import AdobeAnalyticsUtils from "./AdobeAnalyticsUtils.js";
 class AppBase extends AppParameters {
 
   // EVENTED //
-  _evented;
+  //_evented;
   // WATCH UTILS //
-  _watchUtils;
+  //_watchUtils;
 
   // APP NAME //
   name = 'ApplicationTemplate';
@@ -41,12 +41,12 @@ class AppBase extends AppParameters {
     const analyticsUtils = new AdobeAnalyticsUtils({source: this});
 
     // EVENTED AND WATCHUTILS //
-    require(['esri/core/Evented', 'esri/core/watchUtils'], (Evented, watchUtils) => {
+    // require(['esri/core/Evented', 'esri/core/watchUtils'], (Evented, watchUtils) => {
 
       // EVENTED //
-      this._evented = new Evented();
+      // this._evented = new Evented();
       // WATCH UTILS //
-      this._watchUtils = watchUtils;
+      // this._watchUtils = watchUtils;
 
       // APP NAME //
       const pathParts = location.pathname.split('/');
@@ -61,7 +61,7 @@ class AppBase extends AppParameters {
       // STARTUP DIALOG //
       this.initializeStartupDialog();
 
-    });
+    // });
   }
 
   /**

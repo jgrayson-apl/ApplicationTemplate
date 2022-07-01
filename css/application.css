@@ -7,13 +7,20 @@ html, body {
   overflow: hidden;
 }
 
-.calcite-theme-light,
-.calcite-theme-dark,
-.calcite-theme-app {
-  --calcite-ui-info: #f07062;;
-  --calcite-ui-brand: #d83020;
-  --calcite-ui-brand-hover: #f2877b;
-  --calcite-ui-brand-press: #e65240;
+.calcite-theme-light{
+  --calcite-ui-info: #77bde7;;
+  --calcite-ui-brand: #00619b;
+  --calcite-ui-icon-color: #00619b;
+  --calcite-ui-brand-hover: #00304d;
+  --calcite-ui-brand-press: #77bde7;
+}
+
+.calcite-theme-dark {
+  --calcite-ui-info: #3db8ff;;
+  --calcite-ui-brand: #009af2;
+  --calcite-ui-icon-color: #009af2;
+  --calcite-ui-brand-hover: #0089de;
+  --calcite-ui-brand-press: #59d6ff;
 }
 
 .esri-widget,
@@ -26,7 +33,8 @@ html, body {
 .esri-popup__pointer-direction,
 .esri-button {
   background-color: var(--calcite-ui-foreground-1) !important;
-  color: var(--calcite-ui-text-2) !important;
+  /*color: var(--calcite-ui-text-2) !important;*/
+  color: var(--calcite-ui-icon-color) !important;
 }
 
 .toggle-panel[hidden] {
@@ -37,6 +45,7 @@ header[slot="header"] {
   z-index: 99;
   padding: 0 1rem 0 1rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var();
 }
 
 .application-title {
