@@ -19,11 +19,6 @@ import AdobeAnalyticsUtils from "./AdobeAnalyticsUtils.js";
 
 class AppBase extends AppParameters {
 
-  // EVENTED //
-  //_evented;
-  // WATCH UTILS //
-  //_watchUtils;
-
   // APP NAME //
   name = 'ApplicationTemplate';
   // APP TITLE //
@@ -40,28 +35,19 @@ class AppBase extends AppParameters {
     // ADOBE ANALYTICS //
     const analyticsUtils = new AdobeAnalyticsUtils({source: this});
 
-    // EVENTED AND WATCHUTILS //
-    // require(['esri/core/Evented', 'esri/core/watchUtils'], (Evented, watchUtils) => {
+    // APP NAME //
+    const pathParts = location.pathname.split('/');
+    this.name = String([pathParts[pathParts.length - 2]]);
 
-      // EVENTED //
-      // this._evented = new Evented();
-      // WATCH UTILS //
-      // this._watchUtils = watchUtils;
+    // ALERTS AND NOTICES //
+    this.initializeAlertNotice();
 
-      // APP NAME //
-      const pathParts = location.pathname.split('/');
-      this.name = String([pathParts[pathParts.length - 2]]);
+    // TOGGLE ACTION & PANELS //
+    this.initializeSidePanels();
 
-      // ALERTS AND NOTICES //
-      this.initializeAlertNotice();
+    // STARTUP DIALOG //
+    this.initializeStartupDialog();
 
-      // TOGGLE ACTION & PANELS //
-      this.initializeSidePanels();
-
-      // STARTUP DIALOG //
-      this.initializeStartupDialog();
-
-    // });
   }
 
   /**
