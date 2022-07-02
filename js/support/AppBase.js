@@ -53,11 +53,12 @@ class AppBase extends AppParameters {
   /**
    * LOAD APP CONFIG
    *
-   * @returns {Promise}
+   * @param {string|null} configPath
+   * @returns {Promise<unknown>}
    */
-  async load() {
+  async load(configPath = null) {
     return new Promise((resolve, reject) => {
-      super.load().then(() => {
+      super.load(configPath).then(() => {
 
         // APPLICATION SHARING //
         this.initializeSharing();
