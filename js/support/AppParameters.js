@@ -56,10 +56,10 @@ class AppParameters extends Watchable {
    * @param {string | null} configPath
    * @returns {Promise}
    */
-  async load(configPath = AppParameters.DEFAULT_CONFIG_PATH) {
+  async load(configPath) {
     return new Promise((resolve, reject) => {
 
-      fetch(configPath).then(res => {
+      fetch(configPath || AppParameters.DEFAULT_CONFIG_PATH).then(res => {
         return res.ok
           ? res.json()
           : Promise.reject(`Error loading application configuration. HTTP status ${ res.status }: ${ res.statusText }`);
