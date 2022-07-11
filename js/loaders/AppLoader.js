@@ -63,6 +63,9 @@ class AppLoader {
       // ESRI CONFIG //
       require(['esri/config'], (esriConfig) => {
 
+        // SIGN IN MESSAGE //
+        let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
+
         // PORTAL URL //
         if (this.app?.portalUrl) {
           esriConfig.portalUrl = this.app.portalUrl;
@@ -78,15 +81,14 @@ class AppLoader {
 
           // LOAD PORTAL //
           this._loadPortal().then(() => {
-            resolve(`Application created via API key. [ ${ (new Date()).toLocaleString() } ]`);
+            signInMessage = `Application created via API key. [ ${ (new Date()).toLocaleString() } ]`;
+            resolve(signInMessage);
           }).catch(reject);
 
         } else {
           require(['esri/identity/IdentityManager', 'esri/identity/OAuthInfo'], (esriId, OAuthInfo) => {
-
             // SHARING URL //
             const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
-            let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
 
             //
             // OAUTH //
@@ -104,7 +106,7 @@ class AppLoader {
 
             }
 
-            // CHECK SIGNIN STATUS //
+            // CHECK SIGN-IN STATUS //
             esriId.checkSignInStatus(portalSharingURL).then(() => {
               return esriId.getCredential(portalSharingURL);
             }).catch(() => {
@@ -132,7 +134,7 @@ class AppLoader {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
         // CREATE PORTAL //
-        const portal = new Portal({authMode: this.app.authMode, ...params});
+        const portal = new Portal({authMode: this.app?.authMode || 'auto', ...params});
         // LOAD PORTAL //
         portal.load().then(() => {
           Promise.all([
