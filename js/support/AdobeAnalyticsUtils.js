@@ -45,13 +45,12 @@ class AdobeAnalyticsUtils {
 
   /**
    *
-   * @param {Watchable} [source]
+   * @param {AppBase} [source]
    */
   constructor({source}) {
 
-    // CONDITIONALLY LOAD MTAGS //
+    // CONDITIONALLY LOAD MTAGS IF URL ORIGINATES FROM esri.com //
     if (window.location.origin.toLowerCase().endsWith('.esri.com')) {
-      // IF URL ORIGINATES FROM esri.com //
 
       // ADOBE ANALYTICS TAGS //
       const scriptTag = document.createElement('script');
@@ -59,16 +58,21 @@ class AdobeAnalyticsUtils {
       document.head.appendChild(scriptTag);
 
       // WATCH FOR NAME AND TITLE CHANGES TO APPLICATION //
-      source && source.watch('name', name => {
+      source?.reactiveUtils.watch('name', name => {
         this.update({pageName: name});
       });
-      source && source.watch('title', title => {
+      source?.reactiveUtils.watch('title', title => {
         this.update({pageTitle: title});
       });
 
     } else {
       console.warn("mtags not loaded: url not originating from esri.com...");
     }
+
+  }
+
+
+  static ShouldLoad(){
 
   }
 

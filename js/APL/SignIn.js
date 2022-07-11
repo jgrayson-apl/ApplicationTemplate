@@ -37,7 +37,7 @@ class SignIn extends HTMLElement {
   constructor() {
     super();
 
-    const shadowRoot = this.attachShadow({mode: 'open'})
+    const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
       <style>
        .signIn-container .signIn-username {
@@ -115,12 +115,12 @@ class SignIn extends HTMLElement {
     // PORTAL //
     this._portal = value;
     if (this._portal) {
-      require(['esri/identity/IdentityManager', 'esri/core/watchUtils'], (esriId, watchUtils) => {
+      require(['esri/identity/IdentityManager', 'esri/core/reactiveUtils'], (esriId, reactiveUtils) => {
 
         this.userSignInItem && this.userSignInItem.addEventListener('click', this.userSignIn);
         this.userSignOutItem && this.userSignOutItem.addEventListener('click', this.userSignOut);
 
-        watchUtils.init(this._portal, 'user', (user) => {
+        reactiveUtils.watch(() => this._portal.user, (user) => {
           this.updateUserUI().then(() => {
             this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
           }).catch(this.displayError);
@@ -146,7 +146,7 @@ class SignIn extends HTMLElement {
   updateUserUI() {
     return new Promise((resolve, reject) => {
       if (this._portal) {
-        const hasUser = (this._portal.user != null)
+        const hasUser = (this._portal.user != null);
 
         this.portalInfoItem && (this.portalInfoItem.hidden = !hasUser);
         this.userSignInItem && (this.userSignInItem.hidden = hasUser);
@@ -154,7 +154,7 @@ class SignIn extends HTMLElement {
 
         if (hasUser) {
 
-          const firstName = this._portal.user.fullName.split(' ')[0]
+          const firstName = this._portal.user.fullName.split(' ')[0];
           this.userStatusBtn.innerHTML = `${ firstName } (${ this._portal.name })`;
           this.userStatusBtn.title = this._portal.user.fullName;
           this.avatar.thumbnail = this._portal.user.thumbnailUrl;

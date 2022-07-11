@@ -14,12 +14,11 @@
  limitations under the License.
  */
 
-import Watchable from "../support/Watchable.js";
 import GroupLoader from "./GroupLoader.js";
 import MapLoader from "./MapLoader.js";
 import ViewLoader from "./ViewLoader.js";
 
-class AppLoader extends Watchable {
+class AppLoader {
 
   // APPLICATION //
   app;
@@ -34,7 +33,6 @@ class AppLoader extends Watchable {
    *
    */
   constructor({app}) {
-    super();
     this.app = app;
   }
 

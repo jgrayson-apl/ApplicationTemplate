@@ -24,7 +24,7 @@ export default class SynchronizedViews {
     'LOCATION': 1,
     'SCALE': 2,
     'LOCATION_AND_SCALE': 3
-  }
+  };
   _syncType = SynchronizedViews.SYNC_TYPE.NONE;
 
   get syncType() {
@@ -41,9 +41,9 @@ export default class SynchronizedViews {
    * @param views
    */
   constructor({views}) {
-    // WATCH UTILS //
-    require(['esri/core/watchUtils'], (watchUtils) => {
-      this.watchUtils = watchUtils;
+    // REACTIVE UTILS //
+    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
+      this.reactiveUtils = reactiveUtils;
 
       this._views = views;
       this.syncType = (this._views && (this._views.length > 0))
@@ -142,7 +142,6 @@ export default class SynchronizedViews {
       if (viewpointWatchHandle || scheduleId) { return; }
 
       if (!view.animation) {
-        //others.forEach((otherView) => { otherView.viewpoint = view.viewpoint; });
         this.sync(others, view.viewpoint);
       }
 
@@ -150,20 +149,19 @@ export default class SynchronizedViews {
       scheduleId = setTimeout(() => {
         scheduleId = null;
         viewpointWatchHandle = view.watch('viewpoint', (newValue) => {
-          //others.forEach((otherView) => { otherView.viewpoint = newValue; });
           this.sync(others, newValue);
         });
       }, 0);
 
       // stop as soon as another view starts interacting, like if the user starts panning
-      otherInteractHandlers = others.map((otherView) => {
-        return this.watchUtils.watch(otherView, 'interacting,animation', (value) => {
-          if (value) { clear(); }
-        });
-      });
+      otherInteractHandlers = others.reduce((list, otherView) => {
+        const interacting = this.reactiveUtils.when(() => otherView.interacting, (value) => (value && clear()));
+        const animation = this.reactiveUtils.when(() => otherView.animation, (value) => (value && clear()));
+        return list.concat(interacting, animation);
+      }, []);
 
       // or stop when the view is stationary again
-      viewStationaryHandle = this.watchUtils.whenTrue(view, 'stationary', clear);
+      viewStationaryHandle = this.reactiveUtils.when(() => view.stationary, clear);
     });
 
     return {
@@ -172,7 +170,7 @@ export default class SynchronizedViews {
         clear();
         interactWatcher.remove();
       }
-    }
+    };
   }
 
   /**
@@ -195,7 +193,7 @@ export default class SynchronizedViews {
         handles && handles.forEach((h) => { h.remove(); });
         handles = null;
       }
-    }
+    };
   }
 
 }

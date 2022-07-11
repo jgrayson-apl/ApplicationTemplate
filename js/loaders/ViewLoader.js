@@ -14,15 +14,12 @@
  limitations under the License.
  */
 
-import Watchable from "../support/Watchable.js";
-
-class ViewLoader extends Watchable {
+class ViewLoader {
 
   // VIEW PROPERTIES //
   _viewProperties;
 
   constructor(viewProperties) {
-    super();
     this._viewProperties = viewProperties;
   }
 

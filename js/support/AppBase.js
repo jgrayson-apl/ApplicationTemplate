@@ -14,17 +14,35 @@
  limitations under the License.
  */
 
-import AppParameters from "./AppParameters.js";
 import AdobeAnalyticsUtils from "./AdobeAnalyticsUtils.js";
+import AppConfig from './AppConfig.js';
 
-class AppBase extends AppParameters {
+class AppBase extends AppConfig {
 
   // APP NAME //
   name = 'ApplicationTemplate';
+
   // APP TITLE //
-  title = null;
+  _title = null;
+  set title(value) {
+    this._title = value;
+    document.querySelectorAll('.application-title').forEach(node => { node.innerHTML = this._title; });
+  }
+
+  get title() {
+    return this._title;
+  }
+
   // APP DESCRIPTION //
-  description = null;
+  _description = null;
+  set description(value) {
+    this._description = value;
+    document.querySelectorAll('.application-description').forEach(node => { node.innerHTML = this._description; });
+  }
+
+  get description() {
+    return this._description;
+  }
 
   /**
    *
@@ -48,6 +66,9 @@ class AppBase extends AppParameters {
     // STARTUP DIALOG //
     this.initializeStartupDialog();
 
+    // APPLICATION SHARING //
+    this.initializeSharing();
+
   }
 
   /**
@@ -58,16 +79,7 @@ class AppBase extends AppParameters {
    */
   async load(configPath = null) {
     return new Promise((resolve, reject) => {
-      super.load(configPath).then(() => {
-
-        // APPLICATION SHARING //
-        this.initializeSharing();
-
-        // APP INFO //
-        this.configureAppInfo();
-
-        resolve();
-      });
+      super.load(configPath).then(resolve).catch(reject);
     });
   }
 
@@ -185,24 +197,32 @@ class AppBase extends AppParameters {
 
   /**
    *
+   * @param {Map|WebMap|WebScene} [map]
+   * @param {PortalGroup} [group]
    */
-  configureAppInfo() {
+  setApplicationDetails({map = null, group = null}) {
 
-    // TITLE //
-    this.watch('title', title => {
-      document.querySelectorAll('.application-title').forEach(node => { node.innerHTML = title; });
-    });
+    // APP TITLE //
+    this.title = map?.portalItem?.title || this.title || 'Application';
 
-    // DESCRIPTION //
-    const applicationDescriptionNode = document.querySelector('.application-description');
-    if (applicationDescriptionNode.innerHTML && applicationDescriptionNode.innerHTML.length > 0) {
-      this.description = applicationDescriptionNode.innerHTML;
+    // APP DESCRIPTION //
+    this.description = map?.portalItem?.description || group?.description || this.description || '...';
+
+    // STATIC TITLE //
+    /*const applicationTitleNode = document.querySelector('.application-title');
+    if (applicationTitleNode?.innerHTML?.length) {
+      title = applicationTitleNode.innerHTML;
     }
-    this.watch('description', description => {
-      if (description) {
-        document.querySelectorAll('.application-description').forEach(node => { node.innerHTML = description; });
-      }
-    });
+
+    // STATIC DESCRIPTION //
+    const applicationDescriptionNode = document.querySelector('.application-description');
+    if (applicationDescriptionNode?.innerHTML?.length) {
+      description = applicationDescriptionNode.innerHTML;
+    }
+
+    // SET TITLE AND DESCRIPTION //
+    this.title = title;
+    this.description = description;*/
 
   }
 

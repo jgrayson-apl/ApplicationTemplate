@@ -14,51 +14,44 @@
  limitations under the License.
  */
 
-import Watchable from "../support/Watchable.js";
+class MapLoader {
 
-class MapLoader extends Watchable {
-
-  // PORTAL ITEM ID //
-  id;
-  // MAP //
-  map;
+  // CONFIG//
+  config;
 
   constructor(config) {
-    super();
 
-    this.id = (config.webmap || config.webscene);
-
-    if (config.webmap) {
-      require(['esri/WebMap'], WebMap => {
-        this.map = new WebMap({portalItem: {id: this.id}});
-      });
-    }
-
-    if (config.webscene) {
-      require(['esri/WebScene'], WebScene => {
-        this.map = new WebScene({portalItem: {id: this.id}});
-      });
-    }
-
-    //
-    // TODO: DO WE CREATE A DEFAULT MAP?
-    //
+    this.config = config;
 
   }
 
+  /**
+   *
+   * @returns {Promise<unknown>}
+   */
   loadMap() {
     return new Promise((resolve, reject) => {
-      if (this.id) {
-        this.watch('map', map => {
-          map.loadAll().then(() => {
-            resolve(map);
-          }).catch(error => {
-            reject(error || new Error('Error loading Map'));
+
+      const itemID = (this.config.webmap || this.config.webscene);
+      if (itemID) {
+
+        if (this.config.webmap) {
+          require(['esri/WebMap'], WebMap => {
+            const map = new WebMap({portalItem: {id: itemID}});
+            map.loadAll().then(resolve).catch(reject);
           });
-        });
+        }
+
+        if (this.config.webscene) {
+          require(['esri/WebScene'], WebScene => {
+            const map = new WebScene({portalItem: {id: itemID}});
+            map.loadAll().then(resolve).catch(reject);
+          });
+        }
       } else {
         reject(new Error('No configured WebMap or WebScene id.'));
       }
+
     });
   }
 

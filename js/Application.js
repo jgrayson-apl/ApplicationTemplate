@@ -39,10 +39,8 @@ class Application extends AppBase {
         // PORTAL //
         this.portal = portal;
 
-        // APP TITLE //
-        this.title = this.title || map?.portalItem?.title || 'Application';
-        // APP DESCRIPTION //
-        this.description = this.description || map?.portalItem?.description || group?.description || '...';
+        // SET APPLICATION DETAILS //
+        this.setApplicationDetails({map,group});
 
         // USER SIGN-IN //
         this.configUserSignIn();

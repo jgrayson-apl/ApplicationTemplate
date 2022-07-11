@@ -23,6 +23,11 @@ html, body {
   --calcite-ui-brand-press: #59d6ff;
 }
 
+calcite-button[appearance="solid"] {
+  --calcite-ui-icon-color: var(--calcite-ui-brand-press) !important;
+}
+
+
 .esri-widget,
 .esri-widget__heading,
 .esri-widget--button,
