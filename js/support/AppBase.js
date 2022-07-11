@@ -208,22 +208,6 @@ class AppBase extends AppConfig {
     // APP DESCRIPTION //
     this.description = map?.portalItem?.description || group?.description || this.description || '...';
 
-    // STATIC TITLE //
-    /*const applicationTitleNode = document.querySelector('.application-title');
-    if (applicationTitleNode?.innerHTML?.length) {
-      title = applicationTitleNode.innerHTML;
-    }
-
-    // STATIC DESCRIPTION //
-    const applicationDescriptionNode = document.querySelector('.application-description');
-    if (applicationDescriptionNode?.innerHTML?.length) {
-      description = applicationDescriptionNode.innerHTML;
-    }
-
-    // SET TITLE AND DESCRIPTION //
-    this.title = title;
-    this.description = description;*/
-
   }
 
   /**
