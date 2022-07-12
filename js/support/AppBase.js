@@ -203,10 +203,10 @@ class AppBase extends AppConfig {
   setApplicationDetails({map = null, group = null}) {
 
     // APP TITLE //
-    this.title = map?.portalItem?.title || this.title || 'Application';
+    this.title = this.title?.length ? this.title : (map?.portalItem?.title || 'Application');
 
     // APP DESCRIPTION //
-    this.description = map?.portalItem?.description || group?.description || this.description || '...';
+    this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '...');
 
   }
 
