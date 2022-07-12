@@ -124,7 +124,7 @@ class SignIn extends HTMLElement {
           this.updateUserUI().then(() => {
             this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
           }).catch(this.displayError);
-        });
+        }, {initial: true});
 
         // CREDENTIAL CREATED AND WE DON'T HAVE USER //
         esriId.on('credential-create', ({credential}) => {
