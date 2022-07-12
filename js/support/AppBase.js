@@ -20,13 +20,22 @@ import AppConfig from './AppConfig.js';
 class AppBase extends AppConfig {
 
   // APP NAME //
-  name = 'ApplicationTemplate';
+  _name = 'ApplicationTemplate';
+  set name(value) {
+    this._name = value;
+    this.dispatchEvent(new CustomEvent('name-change', {detail: {name: this._name}}));
+  }
+
+  get name() {
+    return this._name;
+  }
 
   // APP TITLE //
   _title = null;
   set title(value) {
     this._title = value;
     document.querySelectorAll('.application-title').forEach(node => { node.innerHTML = this._title; });
+    this.dispatchEvent(new CustomEvent('title-change', {detail: {title: this._title}}));
   }
 
   get title() {
@@ -38,6 +47,7 @@ class AppBase extends AppConfig {
   set description(value) {
     this._description = value;
     document.querySelectorAll('.application-description').forEach(node => { node.innerHTML = this._description; });
+    this.dispatchEvent(new CustomEvent('description-change', {detail: {description: this._description}}));
   }
 
   get description() {

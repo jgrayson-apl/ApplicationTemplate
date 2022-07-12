@@ -35,13 +35,12 @@ class AdobeAnalyticsUtils {
 
   /**
    *
-   * @type {{pageType: string, pagePath: string, [pageTitle]: string, [pageName]: string}}
+   * @type {{pageType: string, pagePath: string, [pageTitle]: string, [pageName]: string, [pageDescription]:string}}
    * @private
    */
   _dataLayer = {
-    pageType: 'esri-geoxc-apl-demo',
-    pagePath: window.location.pathname
-  }
+    pageType: 'esri-geoxc-apl-demo', pagePath: window.location.pathname
+  };
 
   /**
    *
@@ -58,22 +57,19 @@ class AdobeAnalyticsUtils {
       document.head.appendChild(scriptTag);
 
       // WATCH FOR NAME AND TITLE CHANGES TO APPLICATION //
-      source?.reactiveUtils.watch('name', name => {
+      source.addEventListener('name-change', ({detail: {name}}) => {
         this.update({pageName: name});
       });
-      source?.reactiveUtils.watch('title', title => {
+      source.addEventListener('title-change', ({detail: {title}}) => {
         this.update({pageTitle: title});
+      });
+      source.addEventListener('description-change', ({detail: {description}}) => {
+        this.update({pageDescription: description});
       });
 
     } else {
       console.warn("mtags not loaded: url not originating from esri.com...");
     }
-
-  }
-
-
-  static ShouldLoad(){
-
   }
 
   /**
