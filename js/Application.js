@@ -40,7 +40,7 @@ class Application extends AppBase {
         this.portal = portal;
 
         // SET APPLICATION DETAILS //
-        this.setApplicationDetails({map,group});
+        this.setApplicationDetails({map, group});
 
         // USER SIGN-IN //
         this.configUserSignIn();
@@ -60,12 +60,8 @@ class Application extends AppBase {
    *
    */
   configUserSignIn() {
-    if (this.oauthappid || this.portal?.user) {
-
-      this.signIn = document.getElementById('sign-in');
-      this.signIn && (this.signIn.portal = this.portal);
-
-    }
+    this.signIn = document.getElementById('sign-in');
+    this.signIn && (this.signIn.portal = this.portal);
   }
 
   /**
