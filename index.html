@@ -41,7 +41,8 @@
     <!-- APPLICATION -->
     <link rel="stylesheet" type="text/css" href="./css/app-base.css"/>
     <link rel="stylesheet" type="text/css" href="./css/application.css">
-    <script type="module" src="./js/APL/SignIn.js"></script>
+    <script type="module" src="js/apl/SignIn.js"></script>
+    <script type="module" src="js/apl/FeaturesList.js"></script>
     <script type="module" src="./js/Application.js"></script>
   </head>
   <body class="calcite-theme-light">
@@ -94,7 +95,7 @@
             <calcite-action id="clear-list-selection-action" appearance="clear" scale="m" text-enabled="true" text="clear" title="clear selection"></calcite-action>
             <calcite-action icon="x" title="close panel" class="toggle-close" data-toggle="features-list"></calcite-action>
           </div>
-          <calcite-pick-list id="features-list" filter-enabled="true" loading="true" selection-follows-focus></calcite-pick-list>
+          <apl-features-list id="features-list"></apl-features-list>
         </calcite-panel>
       
       </calcite-shell-panel>
@@ -186,22 +187,7 @@
       </div>
       <calcite-button id="app-details-ok-btn" slot="primary" width="full" hidden>OK</calcite-button>
     </calcite-modal>
-    
-    <!-- FEATURE ITEM TEMPLATE -->
-    <template id="feature-item-template">
-      <calcite-pick-list-item
-        label=""
-        description=""
-        value="">
-        <calcite-action
-          slot="actions-end"
-          label=""
-          scale="s"
-          appearance="clear"
-          icon="information">
-        </calcite-action>
-      </calcite-pick-list-item>
-    </template>
+   
   
   </body>
 </html>

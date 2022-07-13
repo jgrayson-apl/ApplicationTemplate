@@ -171,22 +171,9 @@ class Application extends AppBase {
         const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
         const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
 
-        const layerInfo = {
-          title: 'Current Perimeters',
-          filter: '(IncidentName is not null)',
-          queryParams: {
-            returnGeometry: true,
-            outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
-            orderByFields: ['DateCurrent DESC']
-          },
-          itemInfos: {
-            label: f => `${ f.attributes.IncidentName }`,
-            description: f => `${ dateFormatter.format(new Date(f.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(f.attributes.GISAcres) }`
-          }
-        };
-
         // FEATURE LAYER //
-        const featureLayer = view.map.allLayers.find(layer => layer.title === layerInfo.title);
+        const layerTitle = 'Current Perimeters';
+        const featureLayer = view.map.allLayers.find(layer => layer.title === layerTitle);
         if (featureLayer) {
           featureLayer.load().then(() => {
             featureLayer.set({outFields: ["*"]});
@@ -194,120 +181,53 @@ class Application extends AppBase {
             // LAYER TITLE //
             document.getElementById('features-title').innerHTML = featureLayer.title;
 
-            // OBJECTID FIELD //
-            const objectIdField = featureLayer.objectIdField;
+            // ENABLE TOGGLE ACTION //
+            document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
 
-            const featureSelected = (featureOID) => {
-              view.popup.close();
-              if (featureOID) {
-                const feature = featuresByOID.get(featureOID);
-                const zoomTarget = (feature.geometry.type === 'point') ? feature : feature.geometry.extent.clone().expand(1.5);
-                view.goTo({target: zoomTarget});
-              }
+            // GER FEATURE INFO CALLBACK //
+            const getFeatureDetails = (feature) => {
+              const value = feature.getObjectId();
+
+              const label = `${ feature.attributes.IncidentName }`;
+              const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
+
+              return {label, description, value};
             };
+
+            // LIST OF FEATURES //
+            const featuresList = document.getElementById('features-list');
+            featuresList.initialize({
+              view, featureLayer,
+              queryParams: {
+                where: '(IncidentName is not null)',
+                outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
+                orderByFields: ['DateCurrent DESC']
+              },
+              getFeatureInfo: getFeatureDetails
+            });
+
+            // CLEAR LIST SELECTION //
+            const clearListSelectionAction = document.getElementById('clear-list-selection-action');
+            clearListSelectionAction.addEventListener('click', () => {
+              featuresList.clearSelection();
+            });
 
             // VIEW CLICK //
             view.on('click', clickEvt => {
               view.hitTest(clickEvt, {include: [featureLayer]}).then(hitResponse => {
                 if (hitResponse.results.length) {
-                  const featureOID = hitResponse.results[0].graphic.attributes[objectIdField];
-                  featureSelected(featureOID);
+                  featuresList.updateSelection(hitResponse.results[0].graphic);
                 } else {
-                  featureSelected();
+                  featuresList.clearSelection();
                 }
               });
-            });
-
-            // ENABLE TOGGLE ACTION //
-            document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
-
-            // LIST OF FEATURES //
-            const featuresList = document.getElementById('features-list');
-            featuresList.addEventListener('calciteListChange', (evt) => {
-              const featureOID = evt.detail.size ? Number(Array.from(evt.detail.keys())[0]) : null;
-              featureSelected(featureOID);
-            });
-
-            // UPDATE LIST SELECTION //
-            const updateListSelection = (featureOID) => {
-              if (featureOID) {
-                const featureItem = featuresList.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
-                featureItem && (featureItem.selected = true);
-              } else {
-                featuresList.getSelectedItems().then((selectedItems) => {
-                  selectedItems.forEach(item => {
-                    item.selected = false;
-                  });
-                });
-              }
-            };
-
-            let featuresByOID = new Map();
-            const updateFeaturesList = features => {
-              featuresByOID = features.reduce((list, feature) => {
-                return list.set(feature.attributes[objectIdField], feature);
-              }, new Map());
-
-              // GET CURRENT SELECTED ITEM //
-              const selectedItem = featuresList.querySelector(`calcite-pick-list-item[selected]`);
-              const selectedOID = selectedItem ? selectedItem.value : null;
-
-              // CREATE AND ADD FEATURE ITEMS //
-              featuresList.replaceChildren(...features.map(createFeatureItemNodes));
-              updateFeatureActions();
-
-              selectedOID && updateListSelection(selectedOID);
-            };
-
-            const updateFeatureActions = () => {
-              featuresList.querySelectorAll('calcite-action').forEach(actionNode => {
-                actionNode.addEventListener('click', () => {
-                  const feature = featuresByOID.get(Number(actionNode.parentNode.value));
-                  view.popup.open({features: [feature]});
-                });
-              });
-            };
-
-            // CLEAR LIST SELECTION //
-            const clearListSelectionAction = document.getElementById('clear-list-selection-action');
-            clearListSelectionAction.addEventListener('click', () => {
-              updateListSelection();
-            });
-
-            // FEATURE ITEM TEMPLATE //
-            const featureItemTemplate = document.getElementById('feature-item-template');
-            // CREATE ITEM NODE //
-            const createFeatureItemNodes = (feature) => {
-              const templateNode = featureItemTemplate.content.cloneNode(true);
-              const itemNode = templateNode.querySelector('calcite-pick-list-item');
-              itemNode.setAttribute('label', layerInfo.itemInfos.label(feature));
-              itemNode.setAttribute('description', layerInfo.itemInfos.description(feature));
-              itemNode.setAttribute('value', feature.attributes[objectIdField]);
-              return itemNode;
-            };
-
-            // GET FEATURES BASED ON FILTER //
-            const getFeatures = (filter) => {
-              return promiseUtils.create((resolve, reject) => {
-                const featuresQuery = featureLayer.createQuery();
-                featuresQuery.set({where: filter || '1=1', ...layerInfo.queryParams});
-                featureLayer.queryFeatures(featuresQuery).then(featuresFS => {
-                  resolve(featuresFS.features);
-                }).catch(reject);
-              });
-            };
-
-            // GET ALL FEATURES //
-            getFeatures(layerInfo.filter).then((features) => {
-              updateFeaturesList(features);
-              featuresList.loading = false;
             });
 
           });
         } else {
           this.displayAlert({
             title: `Can't Find Layer`,
-            message: `The layer '${ layerInfo.title }' can't be found in this map.`
+            message: `The layer '${ layerTitle }' can't be found in this map.`
           });
         }
       });
