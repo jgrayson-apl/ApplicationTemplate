@@ -110,7 +110,7 @@ class AppLoader {
             esriId.checkSignInStatus(portalSharingURL).then(() => {
               return esriId.getCredential(portalSharingURL);
             }).catch(() => {
-              /* ... */
+              this.app.authMode = 'immediate';
             }).then(() => {
               // LOAD PORTAL //
               this._loadPortal().then(() => {
