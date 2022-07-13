@@ -16,15 +16,13 @@
 
 import AppBase from "./support/AppBase.js";
 import AppLoader from "./loaders/AppLoader.js";
+import SignIn from './apl/SignIn.js';
 import FeaturesList from './apl/FeaturesList.js';
 
 class Application extends AppBase {
 
   // PORTAL //
   portal;
-
-  // SIGN IN //
-  signIn;
 
   constructor() {
     super();
@@ -40,11 +38,11 @@ class Application extends AppBase {
         // PORTAL //
         this.portal = portal;
 
-        // SET APPLICATION DETAILS //
-        this.setApplicationDetails({map, group});
-
         // USER SIGN-IN //
         this.configUserSignIn();
+
+        // SET APPLICATION DETAILS //
+        this.setApplicationDetails({map, group});
 
         // APPLICATION //
         this.applicationReady({portal, group, map, view}).catch(this.displayError).then(() => {
@@ -61,8 +59,12 @@ class Application extends AppBase {
    *
    */
   configUserSignIn() {
-    this.signIn = document.getElementById('sign-in');
-    this.signIn && (this.signIn.portal = this.portal);
+
+    const signInContainer = document.getElementById('sign-in-container');
+    if (signInContainer) {
+      const signIn = new SignIn({container: signInContainer, portal: this.portal});
+    }
+
   }
 
   /**
@@ -85,7 +87,14 @@ class Application extends AppBase {
           //
           view.set({
             constraints: {snapToZoom: false},
-            qualityProfile: "high"
+            popup: {
+              dockEnabled: true,
+              dockOptions: {
+                buttonEnabled: false,
+                breakpoint: false,
+                position: "top-right"
+              }
+            }
           });
 
           // HOME //
@@ -141,7 +150,6 @@ class Application extends AppBase {
       // VIEW READY //
       this.configView(view).then(() => {
 
-        /* ... */
         this.displayFeatureList(view);
 
         resolve();
@@ -155,18 +163,6 @@ class Application extends AppBase {
    */
   displayFeatureList(view) {
     if (view) {
-
-      // POPUP DOCKING OPTIONS //
-      view.set({
-        popup: {
-          dockEnabled: true,
-          dockOptions: {
-            buttonEnabled: false,
-            breakpoint: false,
-            position: "top-right"
-          }
-        }
-      });
 
       const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
       const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
@@ -199,12 +195,11 @@ class Application extends AppBase {
             return {label, description, value};
           };
 
-          // LIST OF FEATURES //
-          /**
-           *
-           * @type {FeaturesList}
-           */
-          const featuresList = document.getElementById('features-list');
+          // FEATURES LIST CONTAINER
+          const featureListContainer = document.getElementById('feature-list-container');
+
+          // FEATURES LIST //
+          const featuresList = new FeaturesList({container: featureListContainer, view});
           featuresList.initialize({
             view, featureLayer,
             queryParams: {

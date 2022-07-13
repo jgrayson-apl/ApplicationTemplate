@@ -52,6 +52,11 @@ class FeaturesList extends HTMLElement {
   }
 
   /**
+   * @type {HTMLElement}
+   */
+  container;
+
+  /**
    * @type {MapView|SceneView}
    */
   view;
@@ -88,14 +93,24 @@ class FeaturesList extends HTMLElement {
    */
   getFeatureInfo;
 
-  constructor() {
+  /**
+   *
+   * @param {HTMLElement} container
+   * @param {MapView|SceneView} view
+   */
+  constructor({container, view}) {
     super();
+
+    this.container = container;
+    this.view = view;
 
     this.featuresByOID = new Map();
     this.geometryByOID = new Map();
 
     this.queryParams = {
-      where: '1=1', maxRecordCountFactor: 5, returnGeometry: false
+      where: '1=1',
+      maxRecordCountFactor: 5,
+      returnGeometry: false
     };
 
     const shadowRoot = this.attachShadow({mode: 'open'});
@@ -123,6 +138,8 @@ class FeaturesList extends HTMLElement {
       <calcite-pick-list filter-enabled selection-follows-focus loading></calcite-pick-list>           
     `;
 
+    this.container?.append(this);
+
   }
 
   /**
@@ -136,18 +153,16 @@ class FeaturesList extends HTMLElement {
 
   /**
    *
-   * @param {MapView|SceneView} view
    * @param {FeatureLayer} featureLayer
    * @param {Object}queryParams
    * @param {FeatureInfoCallback} getFeatureInfoCallback
    */
-  initialize({view, featureLayer, queryParams = {}, getFeatureInfoCallback}) {
+  initialize({featureLayer, queryParams = {}, getFeatureInfoCallback}) {
     require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-      this.view = view;
       this.featureLayer = featureLayer;
       this.queryParams = {...this.queryParams, ...queryParams};
-      this.getFeatureInfo = getFeatureInfo;
+      this.getFeatureInfo = getFeatureInfoCallback;
 
       // FILTER PLACEHOLDER //
       this.list.setAttribute('filter-placeholder', `Find ${ this.featureLayer.title }...`);
@@ -155,7 +170,7 @@ class FeaturesList extends HTMLElement {
       // CREATE FEATURES LIST //
       this.createFeaturesList();
 
-       // VIEW SELECTION CHANGE //
+      // VIEW SELECTION CHANGE //
       reactiveUtils.watch(() => this.view.popup.selectedFeature, selectedFeature => {
         if (selectedFeature?.layer.id === this.featureLayer.id) {
           const featureOID = selectedFeature.getObjectId();
@@ -203,8 +218,9 @@ class FeaturesList extends HTMLElement {
           this._goToFeatureByOID(featureOID).then(() => {
             action.toggleAttribute('loading', false);
             this.dispatchEvent(new CustomEvent('item-selected', {detail: {feature: this.featuresByOID.get(featureOID)}}));
+          }).catch(()=>{
+            action.toggleAttribute('loading', false);
           });
-
         }
       });
 
@@ -253,11 +269,15 @@ class FeaturesList extends HTMLElement {
         resolve({geometry});
       } else {
         this.featureLayer.queryFeatures({
-          returnGeometry: true, outFields: [], objectIds: [Number(featureOID)]
+          returnGeometry: true,
+          outFields: [],
+          objectIds: [Number(featureOID)]
         }).then(fs => {
-          geometry = fs.features[0].geometry;
-          this.geometryByOID.set(featureOID, geometry);
-          resolve({geometry});
+          if (fs.features.length) {
+            geometry = fs.features[0].geometry;
+            this.geometryByOID.set(featureOID, geometry);
+            resolve({geometry});
+          } else { reject(); }
         });
       }
 
@@ -275,7 +295,7 @@ class FeaturesList extends HTMLElement {
         const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
         const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
         this.view.goTo({target: goToTarget, ...goToOptions}).then(resolve);
-      });
+      }).catch(reject);
     });
   }
 

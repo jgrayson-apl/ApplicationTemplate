@@ -41,8 +41,6 @@
     <!-- APPLICATION -->
     <link rel="stylesheet" type="text/css" href="./css/app-base.css"/>
     <link rel="stylesheet" type="text/css" href="./css/application.css">
-    <script type="module" src="js/apl/SignIn.js"></script>
-    <script type="module" src="js/apl/FeaturesList.js"></script>
     <script type="module" src="./js/Application.js"></script>
   </head>
   <body class="calcite-theme-light">
@@ -54,7 +52,7 @@
         
         <div class="content-row">
           
-          <apl-sign-in id="sign-in"></apl-sign-in>
+          <div id="sign-in-container"></div>
           
           <calcite-action-bar class="content-row" expand-disabled="true">
             <calcite-action id="app-share-action" appearance="clear" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
@@ -95,7 +93,7 @@
             <calcite-action id="clear-list-selection-action" appearance="clear" scale="m" text-enabled="true" text="clear" title="clear selection"></calcite-action>
             <calcite-action icon="x" title="close panel" class="toggle-close" data-toggle="features-list"></calcite-action>
           </div>
-          <apl-features-list id="features-list"></apl-features-list>
+          <div id="feature-list-container"></div>
         </calcite-panel>
       
       </calcite-shell-panel>

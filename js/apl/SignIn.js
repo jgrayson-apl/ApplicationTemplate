@@ -30,12 +30,25 @@ class SignIn extends HTMLElement {
   static version = '0.0.1';
 
   /**
+   * @type {HTMLElement}
+   */
+  container;
+
+  /**
    * @type {Portal}
    */
-  _portal;
+  portal;
 
-  constructor() {
+  /**
+   *
+   * @param {HTMLElement} container
+   * @param {Portal} portal
+   */
+  constructor({container , portal}) {
     super();
+
+    this.container = container;
+    this.portal = portal;
 
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
@@ -77,10 +90,7 @@ class SignIn extends HTMLElement {
       </calcite-dropdown>
     `;
 
-    // BIND METHODS //
-    this.updateUserUI = this.updateUserUI.bind(this);
-    this.userSignIn = this.userSignIn.bind(this);
-    this.userSignOut = this.userSignOut.bind(this);
+    this.container?.append(this);
 
   }
 
@@ -104,23 +114,27 @@ class SignIn extends HTMLElement {
       this.portalInfoUrl.href && window.open(this.portalInfoUrl.href);
     });
 
+    // BIND METHODS //
+    this.updateUserUI = this.updateUserUI.bind(this);
+    this.userSignIn = this.userSignIn.bind(this);
+    this.userSignOut = this.userSignOut.bind(this);
+
+    this.initialize();
+
   }
 
   /**
    *
-   * @param {Portal} value
    */
-  set portal(value) {
+  initialize() {
 
-    // PORTAL //
-    this._portal = value;
-    if (this._portal) {
+    if (this.portal) {
       require(['esri/identity/IdentityManager', 'esri/core/reactiveUtils'], (esriId, reactiveUtils) => {
 
         this.userSignInItem && this.userSignInItem.addEventListener('click', this.userSignIn);
         this.userSignOutItem && this.userSignOutItem.addEventListener('click', this.userSignOut);
 
-        reactiveUtils.watch(() => this._portal.user, (user) => {
+        reactiveUtils.watch(() => this.portal.user, (user) => {
           this.updateUserUI().then(() => {
             this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
           }).catch(this.displayError);
@@ -128,7 +142,7 @@ class SignIn extends HTMLElement {
 
         // CREDENTIAL CREATED AND WE DON'T HAVE USER //
         esriId.on('credential-create', ({credential}) => {
-          credential && (!this._portal.user) && this.userSignIn();
+          credential && (!this.portal.user) && this.userSignIn();
         });
 
       });
@@ -145,8 +159,8 @@ class SignIn extends HTMLElement {
    */
   updateUserUI() {
     return new Promise((resolve, reject) => {
-      if (this._portal) {
-        const hasUser = (this._portal.user != null);
+      if (this.portal) {
+        const hasUser = (this.portal.user != null);
 
         this.portalInfoItem && (this.portalInfoItem.hidden = !hasUser);
         this.userSignInItem && (this.userSignInItem.hidden = hasUser);
@@ -154,16 +168,16 @@ class SignIn extends HTMLElement {
 
         if (hasUser) {
 
-          const firstName = this._portal.user.fullName.split(' ')[0];
-          this.userStatusBtn.innerHTML = `${ firstName } (${ this._portal.name })`;
-          this.userStatusBtn.title = this._portal.user.fullName;
-          this.avatar.thumbnail = this._portal.user.thumbnailUrl;
-          this.avatar.username = this._portal.user.username;
+          const firstName = this.portal.user.fullName.split(' ')[0];
+          this.userStatusBtn.innerHTML = `${ firstName } (${ this.portal.name })`;
+          this.userStatusBtn.title = this.portal.user.fullName;
+          this.avatar.thumbnail = this.portal.user.thumbnailUrl;
+          this.avatar.username = this.portal.user.username;
 
-          this.portalInfoUsername.innerHTML = this._portal.user.username;
-          this.portalInfoName.innerHTML = this._portal.name;
+          this.portalInfoUsername.innerHTML = this.portal.user.username;
+          this.portalInfoName.innerHTML = this.portal.name;
 
-          const organizationUrl = `https://${ this._portal.urlKey }.${ this._portal.customBaseUrl }/`;
+          const organizationUrl = `https://${ this.portal.urlKey }.${ this.portal.customBaseUrl }/`;
           this.portalInfoUrl.innerHTML = organizationUrl;
           this.portalInfoUrl.href = organizationUrl;
 
@@ -180,7 +194,7 @@ class SignIn extends HTMLElement {
         resolve();
       } else {
         this.userStatusBtn && (this.userStatusBtn.disabled = true);
-        reject(new Error(`Can't sign in to '${ this._portal.name }' [${ this._portal.url }]`));
+        reject(new Error(`Can't sign in to '${ this.portal.name }' [${ this.portal.url }]`));
       }
     });
   }
@@ -192,8 +206,8 @@ class SignIn extends HTMLElement {
   userSignIn() {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
-        this._portal = new Portal({authMode: 'immediate'});
-        this._portal.load().then(() => {
+        this.portal = new Portal({authMode: 'immediate'});
+        this.portal.load().then(() => {
           this.updateUserUI().then(resolve);
         }).catch(reject).then();
       });
@@ -208,7 +222,7 @@ class SignIn extends HTMLElement {
     return new Promise((resolve, reject) => {
       require(['esri/identity/IdentityManager'], (IdentityManager) => {
         IdentityManager.destroyCredentials();
-        this._portal && (this._portal.user = null);
+        this.portal && (this.portal.user = null);
         this.updateUserUI().then(resolve);
       });
     });
