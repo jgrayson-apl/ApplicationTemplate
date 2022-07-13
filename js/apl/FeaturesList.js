@@ -82,7 +82,7 @@ class FeaturesList extends HTMLElement {
 
   /**
    *
-   * @callback getFeatureInfoCallback
+   * @callback FeatureInfoCallback
    * @param {Graphic} feature
    * @returns {FeatureInfo}
    */
@@ -95,9 +95,7 @@ class FeaturesList extends HTMLElement {
     this.geometryByOID = new Map();
 
     this.queryParams = {
-      where: '1=1',
-      maxRecordCountFactor: 5,
-      returnGeometry: false
+      where: '1=1', maxRecordCountFactor: 5, returnGeometry: false
     };
 
     const shadowRoot = this.attachShadow({mode: 'open'});
@@ -115,7 +113,7 @@ class FeaturesList extends HTMLElement {
             overflow: hidden;    
         }      
         
-        :host calcite-pick-list{
+        :host calcite-pick-list {
           width: 100%;
           height: 100%; 
           overflow: auto;
@@ -141,18 +139,33 @@ class FeaturesList extends HTMLElement {
    * @param {MapView|SceneView} view
    * @param {FeatureLayer} featureLayer
    * @param {Object}queryParams
-   * @param {getFeatureInfoCallback} getFeatureInfo
+   * @param {FeatureInfoCallback} getFeatureInfoCallback
    */
-  initialize({view, featureLayer, queryParams = {}, getFeatureInfo}) {
+  initialize({view, featureLayer, queryParams = {}, getFeatureInfoCallback}) {
+    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-    this.view = view;
-    this.featureLayer = featureLayer;
-    this.queryParams = {...this.queryParams, ...queryParams};
-    this.getFeatureInfo = getFeatureInfo;
+      this.view = view;
+      this.featureLayer = featureLayer;
+      this.queryParams = {...this.queryParams, ...queryParams};
+      this.getFeatureInfo = getFeatureInfo;
 
-    this.list.setAttribute('filter-placeholder', `Find ${ this.featureLayer.title }...`);
+      // FILTER PLACEHOLDER //
+      this.list.setAttribute('filter-placeholder', `Find ${ this.featureLayer.title }...`);
 
-    this.createFeaturesList();
+      // CREATE FEATURES LIST //
+      this.createFeaturesList();
+
+       // VIEW SELECTION CHANGE //
+      reactiveUtils.watch(() => this.view.popup.selectedFeature, selectedFeature => {
+        if (selectedFeature?.layer.id === this.featureLayer.id) {
+          const featureOID = selectedFeature.getObjectId();
+          this.updateSelection({featureOID});
+        } else {
+          this.clearSelection();
+        }
+      });
+
+    });
   }
 
   /**
@@ -164,9 +177,10 @@ class FeaturesList extends HTMLElement {
     featuresQuery.set(this.queryParams);
     this.featureLayer.queryFeatures(featuresQuery).then(featuresFS => {
 
+      // CREATE FEATURE LIST ITEMS //
       const featureListItems = featuresFS.features.map(feature => {
         this.featuresByOID.set(feature.getObjectId(), feature);
-        return this.createFeatureListItem({feature});
+        return this._createFeatureListItem({feature});
       });
 
       // ADD FEATURE LIST ITEMS //
@@ -176,27 +190,17 @@ class FeaturesList extends HTMLElement {
       // LIST SELECTION CHANGE //
       this.list.addEventListener('calciteListChange', async (evt) => {
         if (evt.detail.size) {
-          const [featureOID, selectedItem] = evt.detail.entries().next().value;
+          let [featureOID, selectedItem] = evt.detail.entries().next().value;
+
+          // OID AS NUMBER //
+          featureOID = Number(featureOID);
+
+          const feature = this.featuresByOID.get(featureOID);
+          this.view.popup.open({features: [feature]});
 
           const action = selectedItem.querySelector('calcite-action');
           action.toggleAttribute('loading', true);
-
-          let target = this.geometryByOID.get(featureOID);
-          if (!target) {
-
-            target = await this.featureLayer.queryFeatures({
-              returnGeometry: true, outFields: [],
-              objectIds: [Number(featureOID)]
-            }).then(fs => fs.features[0].geometry);
-
-            this.geometryByOID.set(featureOID, target);
-          }
-
-          const zoomTarget = (target.type === 'point') ? target : target.extent.clone().expand(1.5);
-          const goToOptions = (target.type === 'point') ? {scale: 500000} : {};
-
-          this.view.popup.close();
-          this.view.goTo({target: zoomTarget, ...goToOptions}).then(() => {
+          this._goToFeatureByOID(featureOID).then(() => {
             action.toggleAttribute('loading', false);
             this.dispatchEvent(new CustomEvent('item-selected', {detail: {feature: this.featuresByOID.get(featureOID)}}));
           });
@@ -208,13 +212,71 @@ class FeaturesList extends HTMLElement {
       this.list.querySelectorAll('calcite-action').forEach(actionNode => {
         actionNode.addEventListener('click', () => {
           const feature = this.featuresByOID.get(Number(actionNode.parentNode.value));
-          this.view.popup.open({features: [feature]});
           this.dispatchEvent(new CustomEvent('item-action', {detail: {feature}}));
         });
       });
 
     }).catch(console.error);
 
+  }
+
+  /**
+   *
+   * @param {Graphic} feature
+   * @returns {HTMLElement}
+   * @private
+   */
+  _createFeatureListItem({feature}) {
+    const templateContent = FeaturesList.FEATURE_ITEM_TEMPLATE.content.cloneNode(true);
+    const featureListItem = templateContent.querySelector('calcite-pick-list-item');
+
+    const {label, description, value} = this.getFeatureInfo(feature);
+
+    featureListItem.setAttribute('label', label);
+    featureListItem.setAttribute('description', description);
+    featureListItem.setAttribute('value', value);
+
+    return featureListItem;
+  }
+
+  /**
+   *
+   * @param {number} featureOID
+   * @returns {Promise<Graphic>}
+   * @private
+   */
+  _getFeatureGeometry(featureOID) {
+    return new Promise((resolve, reject) => {
+
+      let geometry = this.geometryByOID.get(featureOID);
+      if (geometry) {
+        resolve({geometry});
+      } else {
+        this.featureLayer.queryFeatures({
+          returnGeometry: true, outFields: [], objectIds: [Number(featureOID)]
+        }).then(fs => {
+          geometry = fs.features[0].geometry;
+          this.geometryByOID.set(featureOID, geometry);
+          resolve({geometry});
+        });
+      }
+
+    });
+  }
+
+  /**
+   *
+   * @param {number} featureOID
+   * @private
+   */
+  _goToFeatureByOID(featureOID) {
+    return new Promise((resolve, reject) => {
+      this._getFeatureGeometry(featureOID).then(({geometry}) => {
+        const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
+        const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
+        this.view.goTo({target: goToTarget, ...goToOptions}).then(resolve);
+      });
+    });
   }
 
   /**
@@ -228,37 +290,20 @@ class FeaturesList extends HTMLElement {
   }
 
   /**
-   * UPDATE LIST SELECTION
    *
-   * @param feature
+   * @param {number} featureOID
    */
-  updateSelection(feature) {
-    if (feature) {
-      const featureListItem = this.list.querySelector(`calcite-pick-list-item[value="${ feature.getObjectId() }"]`);
-      featureListItem && (featureListItem.selected = true);
-      this.view.popup.open({features: [feature]});
+  updateSelection({featureOID}) {
+    if (featureOID) {
+      const featureListItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
+      if (featureListItem) {
+        featureListItem.scrollIntoView({block: 'center', behavior: 'smooth'});
+        featureListItem.selected = true;
+      }
     } else {
       this.clearSelection();
     }
   };
-
-  /**
-   *
-   * @param {Graphic} feature
-   * @returns {HTMLElement}
-   */
-  createFeatureListItem({feature}) {
-    const templateContent = FeaturesList.FEATURE_ITEM_TEMPLATE.content.cloneNode(true);
-    const featureListItem = templateContent.querySelector('calcite-pick-list-item');
-
-    const {label, description, value} = this.getFeatureInfo(feature);
-
-    featureListItem.setAttribute('label', label);
-    featureListItem.setAttribute('description', description);
-    featureListItem.setAttribute('value', value);
-
-    return featureListItem;
-  }
 
 }
 

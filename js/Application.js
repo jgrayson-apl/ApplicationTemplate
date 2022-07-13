@@ -16,6 +16,7 @@
 
 import AppBase from "./support/AppBase.js";
 import AppLoader from "./loaders/AppLoader.js";
+import FeaturesList from './apl/FeaturesList.js';
 
 class Application extends AppBase {
 
@@ -154,83 +155,79 @@ class Application extends AppBase {
    */
   displayFeatureList(view) {
     if (view) {
-      require(['esri/core/promiseUtils'], (promiseUtils) => {
 
-        // POPUP DOCKING OPTIONS //
-        view.set({
-          popup: {
-            dockEnabled: true,
-            dockOptions: {
-              buttonEnabled: false,
-              breakpoint: false,
-              position: "top-right"
-            }
+      // POPUP DOCKING OPTIONS //
+      view.set({
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            buttonEnabled: false,
+            breakpoint: false,
+            position: "top-right"
           }
-        });
-
-        const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
-        const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
-
-        // FEATURE LAYER //
-        const layerTitle = 'Current Perimeters';
-        const featureLayer = view.map.allLayers.find(layer => layer.title === layerTitle);
-        if (featureLayer) {
-          featureLayer.load().then(() => {
-            featureLayer.set({outFields: ["*"]});
-
-            // LAYER TITLE //
-            document.getElementById('features-title').innerHTML = featureLayer.title;
-
-            // ENABLE TOGGLE ACTION //
-            document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
-
-            // GER FEATURE INFO CALLBACK //
-            const getFeatureDetails = (feature) => {
-              const value = feature.getObjectId();
-
-              const label = `${ feature.attributes.IncidentName }`;
-              const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
-
-              return {label, description, value};
-            };
-
-            // LIST OF FEATURES //
-            const featuresList = document.getElementById('features-list');
-            featuresList.initialize({
-              view, featureLayer,
-              queryParams: {
-                where: '(IncidentName is not null)',
-                outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
-                orderByFields: ['DateCurrent DESC']
-              },
-              getFeatureInfo: getFeatureDetails
-            });
-
-            // CLEAR LIST SELECTION //
-            const clearListSelectionAction = document.getElementById('clear-list-selection-action');
-            clearListSelectionAction.addEventListener('click', () => {
-              featuresList.clearSelection();
-            });
-
-            // VIEW CLICK //
-            view.on('click', clickEvt => {
-              view.hitTest(clickEvt, {include: [featureLayer]}).then(hitResponse => {
-                if (hitResponse.results.length) {
-                  featuresList.updateSelection(hitResponse.results[0].graphic);
-                } else {
-                  featuresList.clearSelection();
-                }
-              });
-            });
-
-          });
-        } else {
-          this.displayAlert({
-            title: `Can't Find Layer`,
-            message: `The layer '${ layerTitle }' can't be found in this map.`
-          });
         }
       });
+
+      const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
+      const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+
+      // FEATURE LAYER //
+      const layerTitle = 'Current Perimeters';
+      const featureLayer = view.map.allLayers.find(layer => layer.title === layerTitle);
+      if (featureLayer) {
+        featureLayer.load().then(() => {
+          featureLayer.set({outFields: ["*"]});
+
+          // LAYER TITLE //
+          document.getElementById('features-title').innerHTML = featureLayer.title;
+
+          // ENABLE TOGGLE ACTION //
+          document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
+
+          /**
+           * GER FEATURE INFO CALLBACK
+           *
+           * @param {Graphic} feature
+           * @returns {{description: string, label: string, value: string}}
+           */
+          const getFeatureDetails = (feature) => {
+            const value = String(feature.getObjectId());
+
+            const label = `${ feature.attributes.IncidentName }`;
+            const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
+
+            return {label, description, value};
+          };
+
+          // LIST OF FEATURES //
+          /**
+           *
+           * @type {FeaturesList}
+           */
+          const featuresList = document.getElementById('features-list');
+          featuresList.initialize({
+            view, featureLayer,
+            queryParams: {
+              where: '(IncidentName is not null)',
+              outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
+              orderByFields: ['DateCurrent DESC']
+            },
+            getFeatureInfoCallback: getFeatureDetails
+          });
+
+          // CLEAR LIST SELECTION //
+          const clearListSelectionAction = document.getElementById('clear-list-selection-action');
+          clearListSelectionAction.addEventListener('click', () => {
+            featuresList.clearSelection();
+          });
+
+        });
+      } else {
+        this.displayAlert({
+          title: `Can't Find Layer`,
+          message: `The layer '${ layerTitle }' can't be found in this map.`
+        });
+      }
 
     }
   }
