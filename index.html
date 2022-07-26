@@ -58,14 +58,21 @@
             <calcite-action id="app-share-action" appearance="clear" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
             <calcite-action id="app-details-action" appearance="clear" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
           </calcite-action-bar>
-          
-          <calcite-alert id="app-share-alert" icon="" auto-dismiss="" auto-dismiss-duration="medium" scale="m" color="green" aria-hidden="true" role="alert">
+  
+          <!-- SHAREABLE ALERT -->
+          <calcite-alert id="app-share-alert" icon="launch" placement="bottom" closable auto-dismiss auto-dismiss-duration="medium" scale="m" color="green">
             <div slot="message">
               Shareable link has been copied to the clipboard.
             </div>
             <calcite-link id="app-share-link" slot="link" href="#" target="_blank" role="link" title="open in new tab">
               open in new tab
             </calcite-link>
+          </calcite-alert>
+  
+          <!-- NOTICES ADN ALERTS -->
+          <calcite-alert id="app-notice" icon="" scale="m" width="auto" closable color="red">
+            <div slot="title"></div>
+            <div slot="message"></div>
           </calcite-alert>
         
         </div>
@@ -162,12 +169,6 @@
         </calcite-panel>
       </calcite-shell-panel>
       
-      <!-- NOTICES ADN ALERTS -->
-      <calcite-notice id="app-notice" icon="" scale="m" width="auto" dismissible="" color="red">
-        <div slot="title"></div>
-        <div slot="message"></div>
-      </calcite-notice>
-    
     </calcite-shell>
     
     <!-- LOADER -->
