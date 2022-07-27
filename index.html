@@ -85,12 +85,10 @@
           <calcite-action text="Layers" title="map layers" icon="layers" class="toggle-action" data-toggle="layer-list"></calcite-action>
           <calcite-action text="Features" title="list of features" icon="list" class="toggle-action" data-toggle="features-list" hidden></calcite-action>
         </calcite-action-bar>
-        
-        <calcite-panel class="toggle-panel" data-toggle="layer-list" hidden>
-          <div slot="header-content">Layers</div>
-          <div slot="header-actions-end">
-            <calcite-action icon="x" title="close panel" class="toggle-close" data-toggle="layer-list"></calcite-action>
-          </div>
+    
+        <calcite-panel class="toggle-panel" heading="Layers" data-toggle="layer-list" hidden>
+          <calcite-action slot="header-actions-start" icon="layers"></calcite-action>
+          <calcite-action slot="header-actions-end" icon="x" title="close panel" class="toggle-close" data-toggle="layer-list"></calcite-action>
           <div id="layer-list-container"></div>
         </calcite-panel>
         
