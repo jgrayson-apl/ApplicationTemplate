@@ -1,5 +1,5 @@
 /*
- Copyright 2021 Esri
+ Copyright 2022 Esri
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -53,37 +53,47 @@ class SignIn extends HTMLElement {
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
       <style>
-       .signIn-container .signIn-username {
+        :host .signIn-info-content {
+          display:flex;
+          flex-direction:row;
+          align-items:center;
+        }              
+        :host .signIn-info-user {
+          display:flex;
+          flex-direction:column;
+          padding-left:10px;
+        }
+        :host .signIn-username {
           margin-bottom: 4px; 
           --calcite-ui-text-1: var(--calcite-ui-brand);               
-       }         
-       .signIn-container .signIn-portal-name {
-         margin-bottom: 4px;   
-         --calcite-font-size--1: 11pt;            
-       }         
-       .signIn-container .signIn-avatar{
-        box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-       }       
-       .signIn-container .signIn-portal-url{
-        --calcite-ui-text-link: var(--calcite-ui-brand);
-       }      
+        }
+        :host .signIn-portal-name {
+          margin-bottom: 4px;   
+          --calcite-font-size--1: 11pt;            
+        }
+        :host .signIn-avatar {
+          box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }      
+        :host .signIn-portal-url {
+          --calcite-ui-text-link: var(--calcite-ui-brand);
+        }      
       </style>
       
-      <calcite-dropdown class="signIn-container" width="auto" type="click">                
+      <calcite-dropdown width="auto" type="click" placement="bottom-trailing">                
         <calcite-button class="signIn-status-btn" slot="dropdown-trigger" appearance="transparent" color="neutral" scale="m" icon-start="user" width="auto">        
           not signed in
         </calcite-button>        
-        <calcite-dropdown-group selection-mode="none">
+        <calcite-dropdown-group selection-mode="none">          
           <calcite-dropdown-item class="signIn-info">
-            <div style="display:flex;flex-direction:row;align-items:center;">        
+            <div class="signIn-info-content">        
               <calcite-avatar class="signIn-avatar" scale="l" username="" thumbnail=""></calcite-avatar>
-              <div style="display:flex;flex-direction:column;padding-left:10px;">
+              <div class="signIn-info-user">
                 <calcite-label class="signIn-username"></calcite-label>
                 <calcite-label class="signIn-portal-name"></calcite-label>
                 <calcite-link class="signIn-portal-url" target="_blank"></calcite-link>
               </div>
             </div>
-          </calcite-dropdown-item>
+          </calcite-dropdown-item>          
         </calcite-dropdown-group>
         <calcite-dropdown-item class="signIn-sign-in" icon-start="sign-in">Sign In</calcite-dropdown-item>
         <calcite-dropdown-item class="signIn-sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
