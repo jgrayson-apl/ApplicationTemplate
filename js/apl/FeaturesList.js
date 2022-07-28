@@ -30,17 +30,6 @@ class FeaturesList extends HTMLElement {
   static version = '0.0.1';
 
   /**
-   *
-   * @enum {number}
-   */
-  static ACTIVITY = {
-    'NONE': 0,
-    'GOTO': 1,
-    'POPUP': 2,
-    'EVENT': 3
-  };
-
-  /**
    * @type {HTMLTemplateElement}
    */
   static FEATURE_ITEM_TEMPLATE;
@@ -61,6 +50,28 @@ class FeaturesList extends HTMLElement {
       </calcite-pick-list-item>
     `;
   }
+
+  /**
+   *
+   * @enum {string}
+   */
+  static ACTIVITY = {
+    'NONE': 'NONE',
+    'GOTO': 'GOTO',
+    'POPUP': 'POPUP',
+    'EVENT': 'EVENT'
+  };
+
+  /**
+   *
+   * @enum {string}
+   */
+  static ACTIVITY_ICON = {
+    'NONE': 'blank',
+    'GOTO': 'zoom-to-object',
+    'POPUP': 'popup',
+    'EVENT': 'check-circle'
+  };
 
   /**
    * @type {HTMLElement}
@@ -149,14 +160,15 @@ class FeaturesList extends HTMLElement {
             flex-direction: column;
             justify-content: flex-start;            
             min-width: 0;
-            min-height: 0;       
-            height: 100%; 
+            min-height: 0;
             overflow: hidden;    
         }      
         
-        :host calcite-pick-list {
-          width: 100%;
-          height: 100%; 
+        :host calcite-pick-list slot:first-of-type{
+          flex-shrink: 1;
+          flex-grow: 1;
+          min-width: 0;
+          min-height: 0;
           overflow: auto;
         }      
         
@@ -297,7 +309,7 @@ class FeaturesList extends HTMLElement {
     featureListItem.setAttribute('value', value);
 
     const action = featureListItem.querySelector('calcite-action');
-    (this.actionActivity === FeaturesList.ACTIVITY.NONE) && action.setAttribute('icon', 'blank');
+    action.setAttribute('icon', FeaturesList.ACTIVITY_ICON[this.actionActivity]);
 
     return featureListItem;
   }
