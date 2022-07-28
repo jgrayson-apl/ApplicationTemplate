@@ -30,6 +30,17 @@ class FeaturesList extends HTMLElement {
   static version = '0.0.1';
 
   /**
+   *
+   * @enum {number}
+   */
+  static ACTIVITY = {
+    'NONE': 0,
+    'GOTO': 1,
+    'POPUP': 2,
+    'EVENT': 3
+  };
+
+  /**
    * @type {HTMLTemplateElement}
    */
   static FEATURE_ITEM_TEMPLATE;
@@ -69,7 +80,11 @@ class FeaturesList extends HTMLElement {
   /**
    * @type {Object}
    */
-  queryParams;
+  #queryParams;
+  set queryParams(value) {
+    this.#queryParams = value;
+    this.createFeaturesList();
+  }
 
   /**
    * @type {Map<number,Graphic>}
@@ -82,32 +97,43 @@ class FeaturesList extends HTMLElement {
   geometryByOID;
 
   /**
-   * @typedef {{description: string, label: string, value: string}} FeatureInfo
-   */
-
-  /**
    *
    * @callback FeatureInfoCallback
    * @param {Graphic} feature
-   * @returns {FeatureInfo}
+   * @returns {{description: string, label: string, value: string}}
    */
   getFeatureInfo;
 
   /**
-   *
-   * @param {HTMLElement} container
-   * @param {MapView|SceneView} view
+   * @type {FeaturesList.ACTIVITY}
    */
-  constructor({container, view}) {
+  selectActivity;
+
+  /**
+   * @type {FeaturesList.ACTIVITY}
+   */
+  actionActivity;
+
+  /**
+   *
+   * @param {HTMLElement|string} container
+   * @param {MapView|SceneView} view
+   * @param {FeaturesList.ACTIVITY} selectActivity
+   * @param {FeaturesList.ACTIVITY} actionActivity
+   */
+  constructor({container, view, selectActivity = FeaturesList.ACTIVITY.NONE, actionActivity = FeaturesList.ACTIVITY.NONE}) {
     super();
 
-    this.container = container;
+    this.container = (container instanceof HTMLElement) ? container : document.getElementById(container);
     this.view = view;
+
+    this.selectActivity = selectActivity;
+    this.actionActivity = actionActivity;
 
     this.featuresByOID = new Map();
     this.geometryByOID = new Map();
 
-    this.queryParams = {
+    this.#queryParams = {
       where: '1=1',
       maxRecordCountFactor: 5,
       returnGeometry: false
@@ -161,7 +187,7 @@ class FeaturesList extends HTMLElement {
     require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
       this.featureLayer = featureLayer;
-      this.queryParams = {...this.queryParams, ...queryParams};
+      this.#queryParams = {...this.#queryParams, ...queryParams};
       this.getFeatureInfo = getFeatureInfoCallback;
 
       // FILTER PLACEHOLDER //
@@ -189,7 +215,7 @@ class FeaturesList extends HTMLElement {
   createFeaturesList() {
 
     const featuresQuery = this.featureLayer.createQuery();
-    featuresQuery.set(this.queryParams);
+    featuresQuery.set(this.#queryParams);
     this.featureLayer.queryFeatures(featuresQuery).then(featuresFS => {
 
       // CREATE FEATURE LIST ITEMS //
@@ -205,32 +231,50 @@ class FeaturesList extends HTMLElement {
       // LIST SELECTION CHANGE //
       this.list.addEventListener('calciteListChange', async (evt) => {
         if (evt.detail.size) {
-          let [featureOID, selectedItem] = evt.detail.entries().next().value;
+          let [selectionOID, selectedItem] = evt.detail.entries().next().value;
 
           // OID AS NUMBER //
-          featureOID = Number(featureOID);
+          selectionOID = Number(selectionOID);
+          // FEATURE //
+          const feature = this.featuresByOID.get(selectionOID);
 
-          const feature = this.featuresByOID.get(featureOID);
-          this.view.popup.open({features: [feature]});
-
-          const action = selectedItem.querySelector('calcite-action');
-          action.toggleAttribute('loading', true);
-          this._goToFeatureByOID(featureOID).then(() => {
-            action.toggleAttribute('loading', false);
-            this.dispatchEvent(new CustomEvent('item-selected', {detail: {feature: this.featuresByOID.get(featureOID)}}));
-          }).catch(()=>{
-            action.toggleAttribute('loading', false);
-          });
+          switch (this.selectActivity) {
+            case FeaturesList.ACTIVITY.GOTO:
+              this._goToFeatureByOID(selectionOID).then();
+              break;
+            case FeaturesList.ACTIVITY.POPUP:
+              this.view.popup.open({features: [feature]});
+              break;
+            case FeaturesList.ACTIVITY.EVENT:
+              this.dispatchEvent(new CustomEvent('item-selected', {detail: {feature: this.featuresByOID.get(selectionOID)}}));
+              break;
+          }
         }
       });
 
       // ACTION NODES CLICK //
-      this.list.querySelectorAll('calcite-action').forEach(actionNode => {
-        actionNode.addEventListener('click', () => {
-          const feature = this.featuresByOID.get(Number(actionNode.parentNode.value));
-          this.dispatchEvent(new CustomEvent('item-action', {detail: {feature}}));
+      if (this.actionActivity !== FeaturesList.ACTIVITY.NONE) {
+        this.list.querySelectorAll('calcite-action').forEach(actionNode => {
+          actionNode.addEventListener('click', () => {
+            const actionOID = Number(actionNode.parentNode.value);
+            const feature = this.featuresByOID.get(actionOID);
+            const geometry = this.geometryByOID.get(actionOID);
+
+            switch (this.actionActivity) {
+              case FeaturesList.ACTIVITY.GOTO:
+                this._goToFeatureByOID(actionOID).then();
+                break;
+              case FeaturesList.ACTIVITY.POPUP:
+                this.view.popup.open({features: [feature]});
+                break;
+              case FeaturesList.ACTIVITY.EVENT:
+                this.dispatchEvent(new CustomEvent('item-action', {detail: {feature, geometry}}));
+                break;
+            }
+
+          });
         });
-      });
+      }
 
     }).catch(console.error);
 
@@ -251,6 +295,9 @@ class FeaturesList extends HTMLElement {
     featureListItem.setAttribute('label', label);
     featureListItem.setAttribute('description', description);
     featureListItem.setAttribute('value', value);
+
+    const action = featureListItem.querySelector('calcite-action');
+    (this.actionActivity === FeaturesList.ACTIVITY.NONE) && action.setAttribute('icon', 'blank');
 
     return featureListItem;
   }
@@ -291,10 +338,17 @@ class FeaturesList extends HTMLElement {
    */
   _goToFeatureByOID(featureOID) {
     return new Promise((resolve, reject) => {
+
+      const selectedItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
+      const action = selectedItem.querySelector('calcite-action');
+      action.toggleAttribute('loading', true);
+
       this._getFeatureGeometry(featureOID).then(({geometry}) => {
         const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
         const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
-        this.view.goTo({target: goToTarget, ...goToOptions}).then(resolve);
+        this.view.goTo({target: goToTarget, ...goToOptions}).then(resolve).catch(reject).then(() => {
+          action.toggleAttribute('loading', false);
+        });
       }).catch(reject);
     });
   }
@@ -323,7 +377,7 @@ class FeaturesList extends HTMLElement {
     } else {
       this.clearSelection();
     }
-  };
+  }
 
 }
 

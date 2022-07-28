@@ -186,28 +186,33 @@ class Application extends AppBase {
            * @param {Graphic} feature
            * @returns {{description: string, label: string, value: string}}
            */
-          const getFeatureDetails = (feature) => {
-            const value = String(feature.getObjectId());
-
-            const label = `${ feature.attributes.IncidentName }`;
-            const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
-
-            return {label, description, value};
-          };
 
           // FEATURES LIST CONTAINER
           const featureListContainer = document.getElementById('feature-list-container');
 
           // FEATURES LIST //
-          const featuresList = new FeaturesList({container: featureListContainer, view});
+          const featuresList = new FeaturesList({
+            view,
+            container: featureListContainer,
+            selectActivity: FeaturesList.ACTIVITY.GOTO,
+            actionActivity: FeaturesList.ACTIVITY.POPUP
+          });
           featuresList.initialize({
-            view, featureLayer,
+            featureLayer,
             queryParams: {
               where: '(IncidentName is not null)',
               outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
               orderByFields: ['DateCurrent DESC']
             },
-            getFeatureInfoCallback: getFeatureDetails
+            getFeatureInfoCallback: (feature) => {
+              // return {description: string, label: string, value: string} //
+              const value = String(feature.getObjectId());
+
+              const label = `${ feature.attributes.IncidentName }`;
+              const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
+
+              return {label, description, value};
+            }
           });
 
           // CLEAR LIST SELECTION //
