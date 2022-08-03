@@ -64,15 +64,18 @@ calcite-block {
 
 .esri-widget,
 .esri-widget__heading,
-.esri-widget--button,
 .esri-menu,
-.esri-popup__button,
 .esri-popup__main-container,
 .esri-popup__header-container--button:hover,
-.esri-popup__pointer-direction,
-.esri-button {
+.esri-popup__pointer-direction {
   background-color: var(--calcite-ui-foreground-1) !important;
-  /*color: var(--calcite-ui-text-2) !important;*/
+  color: var(--calcite-ui-text-2) !important;
+}
+
+.esri-button,
+.esri-popup__button,
+.esri-widget--button {
+  background-color: var(--calcite-ui-foreground-1) !important;
   color: var(--calcite-ui-icon-color) !important;
 }
 

@@ -104,8 +104,8 @@
   margin: 5px;
   padding: 10px;
   color: var(--calcite-ui-text-2);
-  background-color: var(--calcite-ui-foreground-1);
-  border: solid 1px var(--calcite-ui-border-1);
+  background-color: var(--calcite-ui-foreground-2);
+  border: solid 1px var(--calcite-ui-border-2);
 }
 
 .content-col .panel-content:not(:last-of-type) {
