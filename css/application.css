@@ -7,7 +7,8 @@ html, body {
   overflow: hidden;
 }
 
-.calcite-theme-light {
+.calcite-theme-light,
+.calcite-theme-dark {
   --calcite-ui-info: #77bde7;;
   --calcite-ui-brand: #00619b;
   --calcite-ui-icon-color: #00619b;
@@ -15,22 +16,9 @@ html, body {
   --calcite-ui-brand-press: #77bde7;
 }
 
-.calcite-theme-dark {
-  --calcite-ui-info: #3db8ff;;
-  --calcite-ui-brand: #009af2;
-  --calcite-ui-icon-color: #009af2;
-  --calcite-ui-brand-hover: #0089de;
-  --calcite-ui-brand-press: #59d6ff;
-}
-
-
 calcite-radio-group-item[checked],
 calcite-button[appearance="solid"] {
   --calcite-ui-icon-color: var(--calcite-ui-text-inverse) !important;
-}
-
-[icon="exclamation-mark-triangle-f"] {
-  --calcite-ui-icon-color: #d90012;
 }
 
 .calcite-panel-content {
@@ -84,10 +72,9 @@ calcite-block {
 }
 
 header[slot="header"] {
-  z-index: 99;
   padding: 0 1rem 0 1rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid var();
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--calcite-ui-brand);
 }
 
 .application-title {
@@ -108,6 +95,7 @@ calcite-loader#app-loader {
 }
 
 
+calcite-panel > div[slot="header-actions-start"],
 calcite-panel > div[slot="header-actions-end"] {
   display: inline-flex;
 }
