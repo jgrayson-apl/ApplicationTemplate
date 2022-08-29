@@ -9,11 +9,14 @@ html, body {
 
 .calcite-theme-light,
 .calcite-theme-dark {
-  --calcite-ui-info: #77bde7;;
   --calcite-ui-brand: #00619b;
-  --calcite-ui-icon-color: #00619b;
   --calcite-ui-brand-hover: #00304d;
   --calcite-ui-brand-press: #77bde7;
+  --calcite-ui-icon-color: #00619b;
+}
+
+calcite-modal {
+  --calcite-ui-info: var(--calcite-ui-brand);
 }
 
 calcite-radio-group-item[checked],
@@ -122,8 +125,4 @@ calcite-notice {
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-#bottom-container {
-  height: 100%;
 }
