@@ -38,6 +38,9 @@ class Application extends AppBase {
         // PORTAL //
         this.portal = portal;
 
+        // VIEW SHAREABLE URL PARAMETERS //
+        this.initializeViewShareable({view});
+
         // USER SIGN-IN //
         this.configUserSignIn();
 
@@ -187,7 +190,7 @@ class Application extends AppBase {
            * @returns {{description: string, label: string, value: string}}
            */
 
-          // FEATURES LIST CONTAINER
+            // FEATURES LIST CONTAINER
           const featureListContainer = document.getElementById('feature-list-container');
 
           // FEATURES LIST //
