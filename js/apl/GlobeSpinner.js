@@ -1,0 +1,312 @@
+/*
+ Copyright 2022 Esri
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+/**
+ *
+ * GlobeSpinner
+ *  - Element: apl-globe-spinner
+ *  - Description: Spin the globe
+ *
+ * Author:   John Grayson - Applications Prototype Lab - Esri
+ * Created:  8/30/2022 - 0.0.1 -
+ * Modified:
+ *
+ */
+
+class GlobeSpinner extends HTMLElement {
+
+  static version = '0.0.1';
+
+  /**
+   * @enum {number}
+   */
+  static DIRECTION = {
+    NONE: 0,
+    RIGHT: 1,
+    LEFT: 2
+  };
+
+  /**
+   * @enum {number}
+   */
+  static TARGET = {
+    CENTER: 1,
+    SURFACE: 2
+  };
+
+  /**
+   * @enum {number}
+   */
+  static SPEED = {
+    SLOWER: 0.01,
+    NORMAL: 0.05,
+    FASTER: 0.25
+  };
+
+  /**
+   * @type {number}
+   */
+  static SPIN_FPS = 90;
+
+  /**
+   * @enum {string}
+   */
+  static SCALE_OPTION = {
+    SMALL: 's',
+    MEDIUM: 'm',
+    LARGE: 'l'
+  };
+
+  /**
+   * @type {SceneView}
+   */
+  #view;
+
+  /**
+   * @type {GlobeSpinner.SPEED}
+   */
+  #spinSpeed;
+
+  /**
+   * @type {number}
+   */
+  #headingOffset;
+
+  /**
+   * @type {GlobeSpinner.DIRECTION}
+   */
+  #spinDirection;
+
+  /**
+   * @type {GlobeSpinner.TARGET}
+   */
+  #spinTarget;
+
+  /**
+   * @type {number|null}
+   */
+  #animationHandle;
+
+  /**
+   * @type {boolean}
+   */
+  #configurable;
+
+  /**
+   * @type {string}
+   */
+  get state() {
+    return (this.#spinDirection === GlobeSpinner.DIRECTION.NONE) ? 'idle' : 'spinning';
+  }
+
+  /**
+   *
+   * @param {SceneView} view
+   * @param {GlobeSpinner.DIRECTION} [direction]
+   * @param {GlobeSpinner.TARGET} [target]
+   * @param {GlobeSpinner.SCALE_OPTION} scale
+   * @param {boolean} configurable
+   */
+  constructor({view, direction = GlobeSpinner.DIRECTION.NONE, target = GlobeSpinner.TARGET.CENTER, scale = GlobeSpinner.SCALE_OPTION.MEDIUM, configurable = true}) {
+    super();
+
+    this.#view = view;
+    this.#headingOffset = this.#spinSpeed = GlobeSpinner.SPEED.NORMAL;
+    this.#spinDirection = direction;
+    this.#spinTarget = target;
+    this.#configurable = configurable;
+
+    const shadowRoot = this.attachShadow({mode: 'open'});
+    shadowRoot.innerHTML = `
+      <style>
+        /*@import "https://js.arcgis.com/calcite-components/1.0.0-beta.86/calcite.css";*/
+        :host {          
+          color: var(--calcite-ui-brand);
+          background-color: var(--calcite-ui-foreground-2);
+          border: solid 0.5pt var(--calcite-ui-border-2);                    
+        }
+        :host calcite-action {
+          cursor: pointer;
+        }        
+        :host calcite-action.globe-spinner-direction-action[active] {         
+          --calcite-ui-icon-color: var(--calcite-ui-text-1);
+        }  
+      </style>
+      <calcite-action-pad expand-disabled layout="horizontal">
+        <calcite-action class="globe-spinner-direction-action globe-spinner-direction-left" icon="chevrons-left" scale="${ scale }" title="spin left"></calcite-action>        
+        <calcite-action class="globe-spinner-direction-action globe-spinner-direction-right" icon="chevrons-right" scale="${ scale }" title="spin right"></calcite-action>            
+        <calcite-dropdown title="spin options">
+            <calcite-action slot="dropdown-trigger" icon="gear" scale="s"></calcite-action>
+            <calcite-dropdown-group selection-mode="single" group-title="Spin Target">
+              <calcite-dropdown-item data-type="TARGET" data-target="CENTER" icon-start="globe" active>center</calcite-dropdown-item>
+              <calcite-dropdown-item data-type="TARGET" data-target="SURFACE" icon-start="360-view">surface</calcite-dropdown-item>
+            </calcite-dropdown-group>
+            <calcite-dropdown-group selection-mode="single" group-title="Spin Speed">
+              <calcite-dropdown-item data-type="SPEED" data-speed="SLOWER">slower</calcite-dropdown-item>
+              <calcite-dropdown-item data-type="SPEED" data-speed="NORMAL" active>normal</calcite-dropdown-item>
+              <calcite-dropdown-item data-type="SPEED" data-speed="FASTER">faster</calcite-dropdown-item>
+            </calcite-dropdown-group>            
+        </calcite-dropdown>        
+      </calcite-action-pad>      
+    `;
+
+  }
+
+  /**
+   *
+   */
+  connectedCallback() {
+
+    // LEFT //
+    this.leftAction = this.shadowRoot.querySelector('calcite-action.globe-spinner-direction-left');
+    this.leftAction.addEventListener('click', () => {
+      const isActive = this.leftAction.toggleAttribute('active');
+      this._setSpinState(isActive ? GlobeSpinner.DIRECTION.LEFT : GlobeSpinner.DIRECTION.NONE);
+    });
+
+    // RIGHT //
+    this.rightAction = this.shadowRoot.querySelector('calcite-action.globe-spinner-direction-right');
+    this.rightAction.addEventListener('click', () => {
+      const isActive = this.rightAction.toggleAttribute('active');
+      this._setSpinState(isActive ? GlobeSpinner.DIRECTION.RIGHT : GlobeSpinner.DIRECTION.NONE);
+    });
+
+    // OPTIONS DROPDOWN - TARGET AND SPEED //
+    const optionsDropdown = this.shadowRoot.querySelector('calcite-dropdown');
+
+    // TOGGLE OPTIONS DROPDOWN //
+    optionsDropdown.toggleAttribute('hidden', !this.#configurable);
+
+    // CONFIGURE TARGET AND SPEED OPTIONS //
+    optionsDropdown.addEventListener('calciteDropdownSelect', () => {
+      optionsDropdown.selectedItems.forEach(selectedItem => {
+        switch (selectedItem.dataset.type) {
+          case 'TARGET':
+            this.#spinTarget = GlobeSpinner.TARGET[selectedItem.dataset.target];
+            break;
+          case 'SPEED':
+            this.#spinSpeed = GlobeSpinner.SPEED[selectedItem.dataset.speed];
+            this.#headingOffset = (this.#spinDirection === GlobeSpinner.DIRECTION.RIGHT) ? -this.#spinSpeed : this.#spinSpeed;
+            break;
+        }
+      });
+      this._setSpinDirection(this.#spinDirection);
+    });
+
+    // BIND SPIN EVENTS //
+    this._spin = this._spin.bind(this);
+    this._cancelSpin = this._cancelSpin.bind(this);
+
+    // INITIAL SPIN //
+    this._setSpinState(this.#spinDirection);
+
+  }
+
+  /**
+   *
+   * @param {GlobeSpinner.DIRECTION} direction
+   * @private
+   */
+  _setSpinState(direction) {
+
+    this.#spinDirection = direction || GlobeSpinner.DIRECTION.NONE;
+
+    switch (this.#spinDirection) {
+      case GlobeSpinner.DIRECTION.RIGHT:
+        this.rightAction.toggleAttribute('active', true);
+        this.leftAction.toggleAttribute('active', false);
+        this.#headingOffset = -this.#spinSpeed;
+        break;
+      case GlobeSpinner.DIRECTION.LEFT:
+        this.leftAction.toggleAttribute('active', true);
+        this.rightAction.toggleAttribute('active', false);
+        this.#headingOffset = this.#spinSpeed;
+        break;
+      case GlobeSpinner.DIRECTION.NONE:
+        break;
+    }
+
+    this._setSpinDirection(this.#spinDirection);
+  }
+
+  /**
+   *
+   * @param {GlobeSpinner.DIRECTION} direction
+   * @private
+   */
+  _setSpinDirection(direction) {
+    switch (direction) {
+      case GlobeSpinner.DIRECTION.RIGHT:
+      case GlobeSpinner.DIRECTION.LEFT:
+        this._enableSpin();
+        break;
+      case GlobeSpinner.DIRECTION.NONE:
+        this._cancelSpin();
+        break;
+    }
+  }
+
+  /**
+   *
+   * @private
+   */
+  _cancelSpin() {
+    this.#animationHandle && (cancelAnimationFrame(this.#animationHandle) && (this.#animationHandle = null));
+  }
+
+  /**
+   *
+   * @private
+   */
+  _enableSpin() {
+    //this._cancelSpin();
+    requestAnimationFrame(this._spin);
+  }
+
+  /**
+   *
+   * @private
+   */
+  _spin() {
+    if (this.#spinDirection !== GlobeSpinner.DIRECTION.NONE) {
+
+      let targetParams = {};
+      switch (this.#spinTarget) {
+        case GlobeSpinner.TARGET.CENTER:
+          targetParams = {
+            center: [(this.#view.center.longitude + this.#headingOffset), this.#view.center.latitude]
+          };
+          break;
+        case GlobeSpinner.TARGET.SURFACE:
+          targetParams = {
+            heading: (this.#view.camera.heading + this.#headingOffset),
+            target: this.#view.viewpoint.targetGeometry
+          };
+          break;
+      }
+
+      this.#view.goTo(targetParams, {animate: false}).then(() => {
+        // setTimeout(() => {
+        this.#animationHandle = requestAnimationFrame(this._spin);
+        // }, (1000 / GlobeSpinner.SPIN_FPS));
+      });
+    }
+  }
+
+}
+
+customElements.define("apl-globe-spinner", GlobeSpinner);
+
+export default GlobeSpinner;
