@@ -31,6 +31,11 @@ class SlidesList extends HTMLElement {
   static version = '0.0.1';
 
   /**
+   * @type {HTMLElement}
+   */
+  _container;
+
+  /**
    * @type {SceneView}
    */
   _view;
@@ -52,23 +57,38 @@ class SlidesList extends HTMLElement {
 
   /**
    *
-   * @param {SceneView|null} [view]
-   * @param {string|null} [webSceneId]
-   * @param {boolean|null} [displayThumbnails]
+   * @param {SceneView | null} [view]
+   * @param {HTMLElement | string | null} container
+   * @param {string | null} [webSceneId]
+   * @param {boolean | null} [displayThumbnails]
    */
-  constructor({view, webSceneId = null, displayThumbnails = true}) {
+  constructor({view, container = null, webSceneId = null, displayThumbnails = true}) {
     super();
+
+    this._container = (container instanceof HTMLElement) ? container : document.getElementById(container);
+
+    this._view = view;
+    this._webSceneId = webSceneId || this.getAttribute('webSceneId');
+    this._displayThumbnails = displayThumbnails || this.getAttribute('displayThumbnails');
 
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
       <style>
-        :host {         
+        :host {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start; 
+          min-width: 0;
+          min-height: 0;                     
           color: var(--calcite-ui-brand);
           background-color: var(--calcite-ui-foreground-1) !important;          
         }  
         
-        :host calcite-list {
-          width: 180px;
+        :host calcite-list {   
+          flex: 1 1 auto;                           
+          min-width: 180px;
+          min-height: 0;
+          width: 100%;
           height: auto;
         }
         
@@ -86,9 +106,7 @@ class SlidesList extends HTMLElement {
       <calcite-list></calcite-list>     
     `;
 
-    this._view = view;
-    this._webSceneId = webSceneId || this.getAttribute('webSceneId');
-    this._displayThumbnails = displayThumbnails || this.getAttribute('displayThumbnails');
+    this._container?.append(this);
 
   }
 
