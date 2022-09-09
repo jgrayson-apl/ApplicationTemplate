@@ -216,6 +216,24 @@ class GlobeSpinner extends HTMLElement {
 
   /**
    *
+   */
+  #previousState;
+
+  pause() {
+    this.#previousState = this.#spinDirection;
+    this._setSpinState(GlobeSpinner.DIRECTION.NONE);
+  }
+
+  /**
+   *
+   */
+  resume() {
+    this.#previousState && this._setSpinState(this.#previousState);
+    this.#previousState = null;
+  }
+
+  /**
+   *
    * @param {GlobeSpinner.DIRECTION} direction
    * @private
    */
