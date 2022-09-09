@@ -33,26 +33,21 @@ class GlobeSpinner extends HTMLElement {
    * @enum {number}
    */
   static DIRECTION = {
-    NONE: 0,
-    RIGHT: 1,
-    LEFT: 2
+    NONE: 0, RIGHT: 1, LEFT: 2
   };
 
   /**
    * @enum {number}
    */
   static TARGET = {
-    CENTER: 1,
-    SURFACE: 2
+    CENTER: 1, SURFACE: 2
   };
 
   /**
    * @enum {number}
    */
   static SPEED = {
-    SLOWER: 0.01,
-    NORMAL: 0.05,
-    FASTER: 0.25
+    SLOWER: 0.01, NORMAL: 0.05, FASTER: 0.25
   };
 
   /**
@@ -64,9 +59,7 @@ class GlobeSpinner extends HTMLElement {
    * @enum {string}
    */
   static SCALE_OPTION = {
-    SMALL: 's',
-    MEDIUM: 'm',
-    LARGE: 'l'
+    SMALL: 's', MEDIUM: 'm', LARGE: 'l'
   };
 
   /**
@@ -105,6 +98,20 @@ class GlobeSpinner extends HTMLElement {
   #configurable;
 
   /**
+   * @type {boolean}
+   */
+  #disabled;
+
+  /**
+   *
+   * @param {boolean} value
+   */
+  set disabled(value) {
+    this.#disabled = value;
+    this.actionPad.toggleAttribute('disabled', value);
+  }
+
+  /**
    * @type {string}
    */
   get state() {
@@ -116,17 +123,20 @@ class GlobeSpinner extends HTMLElement {
    * @param {SceneView} view
    * @param {GlobeSpinner.DIRECTION} [direction]
    * @param {GlobeSpinner.TARGET} [target]
-   * @param {GlobeSpinner.SCALE_OPTION} scale
-   * @param {boolean} configurable
+   * @param {GlobeSpinner.SCALE_OPTION} [scale]
+   * @param {GlobeSpinner.SPEED} [speed]
+   * @param {boolean} [configurable]
+   * @param {boolean} [disabled]
    */
-  constructor({view, direction = GlobeSpinner.DIRECTION.NONE, target = GlobeSpinner.TARGET.CENTER, scale = GlobeSpinner.SCALE_OPTION.MEDIUM, configurable = true}) {
+  constructor({view, scale = GlobeSpinner.SCALE_OPTION.MEDIUM, target = GlobeSpinner.TARGET.CENTER, direction = GlobeSpinner.DIRECTION.NONE, speed = GlobeSpinner.SPEED.NORMAL, configurable = true, disabled = false}) {
     super();
 
     this.#view = view;
-    this.#headingOffset = this.#spinSpeed = GlobeSpinner.SPEED.NORMAL;
+    this.#headingOffset = this.#spinSpeed = speed;
     this.#spinDirection = direction;
     this.#spinTarget = target;
     this.#configurable = configurable;
+    this.#disabled = disabled;
 
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
@@ -136,6 +146,10 @@ class GlobeSpinner extends HTMLElement {
           color: var(--calcite-ui-brand);
           background-color: var(--calcite-ui-foreground-2);
           border: solid 0.5pt var(--calcite-ui-border-2);                    
+        }
+        :host calcite-action-pad[disabled] {
+          pointer-events: none;
+          opacity: 0.4;
         }
         :host calcite-action {
           cursor: pointer;
@@ -168,6 +182,10 @@ class GlobeSpinner extends HTMLElement {
    *
    */
   connectedCallback() {
+
+    // ACTION PAD //
+    this.actionPad = this.shadowRoot.querySelector('calcite-action-pad');
+    this.actionPad.toggleAttribute('disabled', this.#disabled);
 
     // LEFT //
     this.leftAction = this.shadowRoot.querySelector('calcite-action.globe-spinner-direction-left');
@@ -309,8 +327,7 @@ class GlobeSpinner extends HTMLElement {
           break;
         case GlobeSpinner.TARGET.SURFACE:
           targetParams = {
-            heading: (this.#view.camera.heading + this.#headingOffset),
-            target: this.#view.viewpoint.targetGeometry
+            heading: (this.#view.camera.heading + this.#headingOffset), target: this.#view.viewpoint.targetGeometry
           };
           break;
       }
