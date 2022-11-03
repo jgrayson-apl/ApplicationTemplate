@@ -82,6 +82,12 @@ header[slot="header"] {
 
 .application-title {
   color: var(--calcite-ui-brand);
+  /*
+  padding: 10px;
+  background-color: #efefef;
+  border-radius: 10px;
+  box-shadow: inset 1px 1px 0 #ffff, 0 0 6px #424242;
+  */
 }
 
 calcite-loader#app-loader {

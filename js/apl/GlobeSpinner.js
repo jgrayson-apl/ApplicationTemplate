@@ -201,6 +201,13 @@ class GlobeSpinner extends HTMLElement {
       this._setSpinState(isActive ? GlobeSpinner.DIRECTION.RIGHT : GlobeSpinner.DIRECTION.NONE);
     });
 
+    // INITIAL UI SETTINGS //
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="CENTER"]').toggleAttribute('active', (this.#spinTarget === GlobeSpinner.TARGET.CENTER));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="SURFACE"]').toggleAttribute('active', (this.#spinTarget === GlobeSpinner.TARGET.SURFACE));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="SLOWER"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.SLOWER));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="NORMAL"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.NORMAL));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="FASTER"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.FASTER));
+
     // OPTIONS DROPDOWN - TARGET AND SPEED //
     const optionsDropdown = this.shadowRoot.querySelector('calcite-dropdown');
 
