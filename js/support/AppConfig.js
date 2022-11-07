@@ -113,7 +113,7 @@ class AppConfig extends EventTarget {
       }
 
       // REMOVE URL PARAMETERS //
-      window.history.pushState({}, '', (window.location.origin + window.location.pathname));
+      //window.history.pushState({}, '', (window.location.origin + window.location.pathname));
     });
   }
 

@@ -18,6 +18,7 @@ import AppBase from "./support/AppBase.js";
 import AppLoader from "./loaders/AppLoader.js";
 import SignIn from './apl/SignIn.js';
 import FeaturesList from './apl/FeaturesList.js';
+import ViewLoading from './apl/ViewLoading.js';
 
 class Application extends AppBase {
 
@@ -79,25 +80,24 @@ class Application extends AppBase {
       if (view) {
         require([
           'esri/core/reactiveUtils',
+          'esri/widgets/Popup',
           'esri/widgets/Home',
           'esri/widgets/Search',
           'esri/widgets/LayerList',
           'esri/widgets/Legend'
-        ], (reactiveUtils, Home, Search, LayerList, Legend) => {
+        ], (reactiveUtils, Popup, Home, Search, LayerList, Legend) => {
 
-          //
-          // CONFIGURE VIEW SPECIFIC STUFF HERE //
-          //
+          // VIEW AND POPUP //
           view.set({
             constraints: {snapToZoom: false},
-            popup: {
+            popup: new Popup({
               dockEnabled: true,
               dockOptions: {
                 buttonEnabled: false,
                 breakpoint: false,
                 position: "top-right"
               }
-            }
+            })
           });
 
           // HOME //
@@ -105,34 +105,26 @@ class Application extends AppBase {
           view.ui.add(home, {position: 'top-left', index: 0});
 
           // LEGEND //
-          /*
-           const legend = new Legend({ view: view });
-           view.ui.add(legend, {position: 'bottom-left', index: 0});
-           */
+          const legend = new Legend({
+            container: 'legend-container',
+            view: view
+          });
+          //view.ui.add(legend, {position: 'bottom-left', index: 0});
 
-          // SEARCH /
-          /*
-           const search = new Search({ view: view});
-           view.ui.add(legend, {position: 'top-right', index: 0});
-           */
+          // SEARCH //
+          const search = new Search({view: view});
+          view.ui.add(search, {position: 'top-right', index: 0});
 
           // LAYER LIST //
           const layerList = new LayerList({
             container: 'layer-list-container',
             view: view,
-            listItemCreatedFunction: (event) => {
-              event.item.open = (event.item.layer.type === 'group');
-            },
             visibleElements: {statusIndicators: true}
           });
 
-          // VIEW UPDATING //
-          this.disableViewUpdating = false;
-          const viewUpdating = document.getElementById('view-updating');
-          view.ui.add(viewUpdating, 'bottom-right');
-          reactiveUtils.watch(() => view.updating, (updating) => {
-            (!this.disableViewUpdating) && viewUpdating.toggleAttribute('active', updating);
-          });
+          // VIEW LOADING INDICATOR //
+          const viewLoading = new ViewLoading({view: view});
+          view.ui.add(viewLoading, 'bottom-right');
 
           resolve();
         });
@@ -177,8 +169,8 @@ class Application extends AppBase {
         featureLayer.load().then(() => {
           featureLayer.set({outFields: ["*"]});
 
-          // LAYER TITLE //
-          document.getElementById('features-title').innerHTML = featureLayer.title;
+          // SET LAYER TITLE FOR FEATURE LIST//
+          document.querySelector('calcite-panel[heading="Features"]').setAttribute('heading', featureLayer.title);
 
           // ENABLE TOGGLE ACTION //
           document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');

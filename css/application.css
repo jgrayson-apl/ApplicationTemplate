@@ -24,25 +24,7 @@ calcite-button[appearance="solid"] {
   --calcite-ui-icon-color: var(--calcite-ui-text-inverse) !important;
 }
 
-.calcite-panel-content {
-  margin-top: 0;
-  margin-bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex-grow: 0;
-  flex-shrink: 1;
-  min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-calcite-block {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.calcite-block-fill {
+calcite-shell-panel calcite-panel:first-of-type {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -53,21 +35,29 @@ calcite-block {
   overflow-y: auto;
 }
 
+.pane:not(:empty) {
+  padding: 8px;
+  margin: 8px;
+  color: var(--calcite-ui-text-1);
+  background-color: var(--calcite-ui-foreground-1);
+  border: solid 1px var(--calcite-ui-border-1);
+}
+
 .esri-widget,
 .esri-widget__heading,
 .esri-menu,
 .esri-popup__main-container,
 .esri-popup__header-container--button:hover,
 .esri-popup__pointer-direction {
-  background-color: var(--calcite-ui-foreground-1) !important;
   color: var(--calcite-ui-text-2) !important;
+  background-color: var(--calcite-ui-foreground-1) !important;
 }
 
 .esri-button,
 .esri-popup__button,
 .esri-widget--button {
-  background-color: var(--calcite-ui-foreground-1) !important;
   color: var(--calcite-ui-icon-color) !important;
+  background-color: var(--calcite-ui-foreground-1) !important;
 }
 
 .toggle-panel[hidden] {
@@ -75,42 +65,23 @@ calcite-block {
 }
 
 header[slot="header"] {
-  padding: 0 1rem 0 1rem;
+  padding: 0 0.8rem 0 0.8rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid var(--calcite-ui-brand);
 }
 
 .application-title {
   color: var(--calcite-ui-brand);
-  /*
-  padding: 10px;
-  background-color: #efefef;
-  border-radius: 10px;
-  box-shadow: inset 1px 1px 0 #ffff, 0 0 6px #424242;
-  */
 }
 
 calcite-loader#app-loader {
   align-self: center;
   justify-self: center;
-  /*z-index: 1000;*/
-  /*top: calc(50vh - 112px) !important;*/
 }
-
-.esri-ui-corner calcite-loader {
-  pointer-events: none;
-  padding: 0;
-  right: 15px;
-}
-
 
 calcite-panel > div[slot="header-actions-start"],
 calcite-panel > div[slot="header-actions-end"] {
   display: inline-flex;
-}
-
-calcite-notice {
-  z-index: 101;
 }
 
 #center-container {
