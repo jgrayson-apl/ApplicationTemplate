@@ -39,7 +39,8 @@ class AdobeAnalyticsUtils {
    * @private
    */
   _dataLayer = {
-    pageType: 'esri-geoxc-apl-demo', pagePath: window.location.pathname
+    pageType: 'esri-geoxc-apl-demo',
+    pagePath: window.location.pathname
   };
 
   /**
