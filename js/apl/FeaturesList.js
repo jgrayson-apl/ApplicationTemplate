@@ -246,7 +246,7 @@ class FeaturesList extends HTMLElement {
       this.panel.setAttribute('heading', this.featureLayer.title);
 
       // FILTER PLACEHOLDER //
-      this.filterEnabled && this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }'...`);
+      this.filterEnabled && this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }' features...`);
 
       // CREATE FEATURES LIST //
       this._createFeaturesList();
@@ -359,7 +359,7 @@ class FeaturesList extends HTMLElement {
 
     } else {
       action.setAttribute('icon', FeaturesList.ACTIVITY_ICON[this.actionActivity]);
-      action.addEventListener('click', (evt) => {
+      action.addEventListener('click', () => {
         const actionOID = Number(action.parentNode.value);
         this._doActivity({activity: this.actionActivity, oid: actionOID, eventName: 'item-action'});
       });
