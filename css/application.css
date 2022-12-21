@@ -83,6 +83,10 @@ calcite-loader#app-loader {
   justify-self: center;
 }
 
+calcite-modal#app-details-modal {
+  --calcite-modal-content-background: var(--calcite-ui-background);
+}
+
 calcite-panel > div[slot="header-actions-start"],
 calcite-panel > div[slot="header-actions-end"] {
   display: inline-flex;

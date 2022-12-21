@@ -55,11 +55,12 @@ class ViewLoading extends HTMLElement {
     shadowRoot.innerHTML = `
       <style>
         :host {
-          pointer-events: none;          
+          pointer-events: none;
+          box-shadow: none !important;
         }
         :host calcite-loader {
-          padding: 0; 
-          margin: auto 15px;
+          --calcite-loader-padding: 0;           
+          margin: auto 15px;          
         }     
       </style>
       <calcite-loader type="indeterminate" scale="s"></calcite-loader>   
@@ -76,7 +77,7 @@ class ViewLoading extends HTMLElement {
       this.view.when(() => {
         const loader = this.shadowRoot.querySelector('calcite-loader');
         reactiveUtils.watch(() => this.view.updating, (updating) => {
-          this.enabled && loader.toggleAttribute('active', updating);
+          this.enabled && loader.toggleAttribute('hidden', !updating);
         });
       });
     });

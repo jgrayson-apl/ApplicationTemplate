@@ -51,7 +51,7 @@ class Application extends AppBase {
         // APPLICATION //
         this.applicationReady({portal, group, map, view}).catch(this.displayError).then(() => {
           // HIDE APP LOADER //
-          document.getElementById('app-loader').removeAttribute('active');
+          document.getElementById('app-loader').toggleAttribute('hidden', true);
         });
 
       }).catch(this.displayError);
@@ -169,9 +169,6 @@ class Application extends AppBase {
         featureLayer.load().then(() => {
           featureLayer.set({outFields: ["*"]});
 
-          // SET LAYER TITLE FOR FEATURE LIST//
-          document.querySelector('calcite-panel[heading="Features"]').setAttribute('heading', featureLayer.title);
-
           // ENABLE TOGGLE ACTION //
           document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
 
@@ -208,12 +205,6 @@ class Application extends AppBase {
 
               return {label, description, value};
             }
-          });
-
-          // CLEAR LIST SELECTION //
-          const clearListSelectionAction = document.getElementById('clear-list-selection-action');
-          clearListSelectionAction.addEventListener('click', () => {
-            featuresList.clearSelection();
           });
 
         });

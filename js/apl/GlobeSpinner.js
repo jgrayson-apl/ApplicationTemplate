@@ -162,16 +162,16 @@ class GlobeSpinner extends HTMLElement {
         <calcite-action class="globe-spinner-direction-action globe-spinner-direction-left" icon="chevrons-left" scale="${ scale }" title="spin left"></calcite-action>        
         <calcite-action class="globe-spinner-direction-action globe-spinner-direction-right" icon="chevrons-right" scale="${ scale }" title="spin right"></calcite-action>            
         <calcite-dropdown title="spin options">
-            <calcite-action slot="dropdown-trigger" icon="gear" scale="s"></calcite-action>
-            <calcite-dropdown-group selection-mode="single" group-title="Spin Target">
-              <calcite-dropdown-item data-type="TARGET" data-target="CENTER" icon-start="globe" active>center</calcite-dropdown-item>
-              <calcite-dropdown-item data-type="TARGET" data-target="SURFACE" icon-start="360-view">surface</calcite-dropdown-item>
-            </calcite-dropdown-group>
-            <calcite-dropdown-group selection-mode="single" group-title="Spin Speed">
-              <calcite-dropdown-item data-type="SPEED" data-speed="SLOWER">slower</calcite-dropdown-item>
-              <calcite-dropdown-item data-type="SPEED" data-speed="NORMAL" active>normal</calcite-dropdown-item>
-              <calcite-dropdown-item data-type="SPEED" data-speed="FASTER">faster</calcite-dropdown-item>
-            </calcite-dropdown-group>            
+          <calcite-action slot="trigger" icon="gear" scale="s"></calcite-action>
+          <calcite-dropdown-group selection-mode="single" group-title="Spin Target">
+            <calcite-dropdown-item data-type="TARGET" data-target="CENTER" icon-start="globe" active>center</calcite-dropdown-item>
+            <calcite-dropdown-item data-type="TARGET" data-target="SURFACE" icon-start="360-view">surface</calcite-dropdown-item>
+          </calcite-dropdown-group>
+          <calcite-dropdown-group selection-mode="single" group-title="Spin Speed">
+            <calcite-dropdown-item data-type="SPEED" data-speed="SLOWER">slower</calcite-dropdown-item>
+            <calcite-dropdown-item data-type="SPEED" data-speed="NORMAL" active>normal</calcite-dropdown-item>
+            <calcite-dropdown-item data-type="SPEED" data-speed="FASTER">faster</calcite-dropdown-item>
+          </calcite-dropdown-group>            
         </calcite-dropdown>        
       </calcite-action-pad>      
     `;

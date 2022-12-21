@@ -82,26 +82,22 @@ class SlidesList extends HTMLElement {
           min-height: 0;                     
           color: var(--calcite-ui-brand);
           background-color: var(--calcite-ui-foreground-1) !important;          
-        }  
-        
+        }          
         :host calcite-list {   
           flex: 1 1 auto;                           
           min-width: 180px;
           min-height: 0;
           width: 100%;
           height: auto;
-        }
-        
+        }        
         :host calcite-list:empty {
           content: 'No Slides Available';
-        }
-        
+        }        
         :host calcite-list-item img {
           padding: 5px;
           height: 44px;          
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-        
+        }        
       </style>
       <calcite-list></calcite-list>     
     `;
@@ -167,7 +163,7 @@ class SlidesList extends HTMLElement {
       slideThumb.toggleAttribute('hidden', !this._displayThumbnails);
       slideListItem.append(slideThumb);
 
-      slideListItem.addEventListener('click', () => {
+      slideListItem.addEventListener('calciteListItemSelect', () => {
         this._view.goTo({target: slide.viewpoint});
       });
 

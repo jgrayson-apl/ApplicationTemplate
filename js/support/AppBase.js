@@ -130,12 +130,12 @@ class AppBase extends AppConfig {
       const appShareAlert = document.getElementById('app-share-alert');
       const appShareLink = document.getElementById('app-share-link');
 
-      appShareAction.addEventListener('calciteActionClick', () => {
+      appShareAction.addEventListener('click', () => {
 
         // SHARE ALERT //
         const shareURL = this.toShareURL();
         appShareLink.setAttribute('href', shareURL);
-        appShareAlert.setAttribute('active', 'true');
+        appShareAlert.setAttribute('open', 'true');
 
         // COPY TO CLIPBOARD //
         navigator.clipboard.writeText(shareURL).then(() => {
@@ -232,7 +232,7 @@ class AppBase extends AppConfig {
     const showStartupId = `show-startup-${ this.name || 'all' }`;
     const showStartup = localStorage.getItem(showStartupId) || 'show';
     if (showStartup === 'show') {
-      appDetailsModal.active = true;
+      appDetailsModal.open = true;
     }
 
     // HIDE STARTUP DIALOG //
@@ -245,7 +245,7 @@ class AppBase extends AppConfig {
     // TOGGLE APP DETAILS DIALOG //
     const appDetailsAction = document.getElementById('app-details-action');
     appDetailsAction.addEventListener('click', () => {
-      appDetailsModal.active = (!appDetailsModal.active);
+      appDetailsModal.open = (!appDetailsModal.open);
     });
 
   }

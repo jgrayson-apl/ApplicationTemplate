@@ -185,7 +185,8 @@ class FeaturesList extends HTMLElement {
           overflow: auto;
         }       
       </style>
-      <calcite-panel>      
+      <calcite-panel heading="Features List">
+        <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>      
         <calcite-pick-list filter-enabled="${ String(this.filterEnabled) }" selection-follows-focus></calcite-pick-list>        
       </calcite-panel>           
     `;
@@ -200,6 +201,15 @@ class FeaturesList extends HTMLElement {
    *
    */
   connectedCallback() {
+
+    // PANEL //
+    this.panel = this.shadowRoot.querySelector('calcite-panel');
+
+    // CLEAR LIST ACTION //
+    this.clearListAction = this.shadowRoot.querySelector('.clear-selection-action');
+    this.clearListAction.addEventListener('click', () => {
+      this.clearSelection();
+    });
 
     // LIST //
     this.list = this.shadowRoot.querySelector('calcite-pick-list');
@@ -232,10 +242,11 @@ class FeaturesList extends HTMLElement {
       this.#queryParams = {...this.#queryParams, ...queryParams};
       this.getFeatureInfo = getFeatureInfoCallback;
 
+      // PANEL HEADING //
+      this.panel.setAttribute('heading', this.featureLayer.title);
+
       // FILTER PLACEHOLDER //
-      if (this.filterEnabled) {
-        this.list.setAttribute('filter-placeholder', `Select ${ this.featureLayer.title }...`);
-      }
+      this.filterEnabled && this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }'...`);
 
       // CREATE FEATURES LIST //
       this._createFeaturesList();
@@ -309,6 +320,9 @@ class FeaturesList extends HTMLElement {
       switch (activity) {
         case FeaturesList.ACTIVITY.GOTO:
           this._goToFeatureByOID(oid).then(() => {
+            if (this.view.popup.selectedFeature?.getObjectId() !== oid) {
+              this.view.popup.close();
+            }
             this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
           });
           break;
@@ -345,7 +359,7 @@ class FeaturesList extends HTMLElement {
 
     } else {
       action.setAttribute('icon', FeaturesList.ACTIVITY_ICON[this.actionActivity]);
-      action.addEventListener('click', () => {
+      action.addEventListener('click', (evt) => {
         const actionOID = Number(action.parentNode.value);
         this._doActivity({activity: this.actionActivity, oid: actionOID, eventName: 'item-action'});
       });
@@ -397,20 +411,22 @@ class FeaturesList extends HTMLElement {
    */
   _goToFeatureByOID(featureOID) {
     return new Promise((resolve, reject) => {
+      require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-      const selectedItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
-      const action = selectedItem.querySelector('calcite-action');
-      action.toggleAttribute('loading', true);
+        const selectedItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
+        const action = selectedItem.querySelector('calcite-action');
+        action.toggleAttribute('loading', true);
 
-      this._getFeatureGeometry({featureOID}).then(({geometry}) => {
-        const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
-        const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
-        this.view.goTo({target: goToTarget, ...goToOptions}).then(() => {
-          resolve({geometry});
-        }).catch(reject).then(() => {
-          action.toggleAttribute('loading', false);
-        });
-      }).catch(reject);
+        this._getFeatureGeometry({featureOID}).then(({geometry}) => {
+          const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
+          const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
+          this.view.goTo({target: goToTarget, ...goToOptions}).then(() => {
+            resolve({geometry});
+          }).catch(reject).then(() => {
+            action.toggleAttribute('loading', false);
+          });
+        }).catch(reject);
+      });
     });
   }
 

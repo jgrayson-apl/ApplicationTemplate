@@ -77,12 +77,9 @@ class SignIn extends HTMLElement {
         :host .signIn-portal-url {
           --calcite-ui-text-link: var(--calcite-ui-brand);
         }      
-      </style>
-      
-      <calcite-dropdown width="auto" type="click" placement="bottom-trailing">                
-        <calcite-button class="signIn-status-btn" slot="dropdown-trigger" appearance="transparent" color="neutral" scale="m" icon-start="user" width="auto">        
-          not signed in
-        </calcite-button>        
+      </style>      
+      <calcite-dropdown width="auto" type="click" placement="bottom-end">                
+        <calcite-action slot="trigger" class="signIn-status-btn" text-enabled text="not signed in" appearance="transparent" icon="user"></calcite-action>        
         <calcite-dropdown-group selection-mode="none">          
           <calcite-dropdown-item class="signIn-info">
             <div class="signIn-info-content">        
@@ -137,7 +134,6 @@ class SignIn extends HTMLElement {
    *
    */
   initialize() {
-
     if (this.portal) {
       require(['esri/identity/IdentityManager', 'esri/core/reactiveUtils'], (esriId, reactiveUtils) => {
 
@@ -179,7 +175,8 @@ class SignIn extends HTMLElement {
         if (hasUser) {
 
           const firstName = this.portal.user.fullName.split(' ')[0];
-          this.userStatusBtn.innerHTML = `${ firstName } (${ this.portal.name })`;
+          //this.userStatusBtn.innerHTML = `${ firstName } (${ this.portal.name })`;
+          this.userStatusBtn.setAttribute('text', `${ firstName } (${ this.portal.name })`);
           this.userStatusBtn.title = this.portal.user.fullName;
           this.avatar.thumbnail = this.portal.user.thumbnailUrl;
           this.avatar.username = this.portal.user.username;
@@ -192,7 +189,8 @@ class SignIn extends HTMLElement {
           this.portalInfoUrl.href = organizationUrl;
 
         } else {
-          this.userStatusBtn.innerHTML = 'not signed in';
+          //this.userStatusBtn.innerHTML = 'not signed in';
+          this.userStatusBtn.setAttribute('text','not signed in');
           this.userStatusBtn.title = '';
           this.avatar.thumbnail = null;
           this.portalInfoUsername.innerHTML = '';
