@@ -10,54 +10,42 @@
     <!-- META -->
     <!--<meta property="og:title" content="">-->
     <!--<meta property="og:description" content="">-->
-    <!--<meta property="og:url" content="https://geoxc-apps2.bd.esri.com/.../index.html">-->
-    <!--<meta property="og:image" content="https://geoxc-apps2.bd.esri.com/.../assets/app.png">-->
+    <!--<meta property="og:url" content="https://geoxc-apps.bd.esri.com/.../index.html">-->
+    <!--<meta property="og:image" content="https://geoxc-apps.bd.esri.com/.../assets/app.png">-->
     
-    <!-- CHARTJS -->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.4.0/chartjs-plugin-annotation.min.js" integrity="sha512-HrwQrg8S/xLPE6Qwe7XOghA/FOxX+tuVF4TxbvS73/zKJSs/b1gVl/P4MsdfTFWYFYg/ISVNYIINcg35Xvr6QQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>-->
-    <!-- DOC: https://chartjs-plugin-datalabels.netlify.app/ -->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>-->
-    <!--
-      https://unpkg.com/chart.js@3
-      https://unpkg.com/chartjs-chart-error-bars@3
-      https://unpkg.com/chartjs-gauge@0.3.0
-      https://github.com/sgratzl/chartjs-chart-error-bars
-      https://www.npmjs.com/package/chartjs-chart-error-bars
-    -->
-    
+    <!-- CHARTJS -- https://www.chartjs.org/ -->
+    <!-- 3.9.1 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0/dist/chartjs-plugin-datalabels.min.js"></script>-->
+    <!--https://github.com/chartjs/chartjs-plugin-datalabels-->
+    <!-- 4.1.2 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
-    <!-- https://github.com/Esri/calcite-components/blob/master/CHANGELOG.md#changelog -->
-    <script src="https://js.arcgis.com/calcite-components/1.0.0-beta.99/calcite.esm.js" type="module"></script>
-    <link href="https://js.arcgis.com/calcite-components/1.0.0-beta.99/calcite.css" rel="stylesheet"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.0.3/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.3/calcite.css"/>
     
     <!-- ArcGIS API for JavaScript-->
     <link href="https://js.arcgis.com/4.25/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
     <script src="https://js.arcgis.com/4.25/"></script>
     
     <!-- APPLICATION -->
-    <link rel="stylesheet" type="text/css" href="./css/app-base.css"/>
     <link rel="stylesheet" type="text/css" href="./css/application.css">
     <script type="module" src="./js/Application.js"></script>
   </head>
-  <body class="calcite-theme-light">
-    <calcite-shell dir="ltr">
+  <body class="calcite-mode-light">
+    <calcite-shell>
       
       <header class="content-row" slot="header">
         <h2 class="content-row">
           <calcite-icon class="application-icon" icon="add-in" scale="l"></calcite-icon>
           <span class="application-title"></span>
         </h2>
-        <div class="content-row">
+        <calcite-action-bar layout="horizontal" expand-disabled="true">
           <div id="sign-in-container"></div>
-          <calcite-action-bar class="content-row" expand-disabled="true">
-            <calcite-action id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
-            <calcite-action id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
-          </calcite-action-bar>
-        </div>
+          <calcite-action id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
+          <calcite-action id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
+        </calcite-action-bar>
       </header>
       
       <!-- LEFT -->
@@ -95,37 +83,32 @@
           <calcite-action text="Results" icon="list" class="toggle-action" data-toggle="results"></calcite-action>
         </calcite-action-bar>
         
-        <calcite-panel heading="Analysis" class="toggle-panel" data-toggle="analysis" hidden>
-          <div id="analysis-container" class="panel-content">
-            analysis details
-          </div>
-          <calcite-block heading="Analysis" description="analysis parameters and results" open="true">
-            <calcite-icon slot="icon" icon="analysis"></calcite-icon>
-            <calcite-block-section text="Parameters" toggle-display="switch" status="invalid">
-              <calcite-label>analysis options</calcite-label>
-            </calcite-block-section>
-            <calcite-block-section text="Results" open status="valid">
-              <calcite-label>analysis results</calcite-label>
-            </calcite-block-section>
-          </calcite-block>
+        <calcite-panel heading="Analysis" class="toggle-panel" data-toggle="analysis">
+          <!-- ... -->
         </calcite-panel>
         
         <calcite-panel heading="Results" class="toggle-panel" data-toggle="results" hidden>
           
-          <calcite-tabs class="margin-m">
+          <calcite-tabs scale="l">
             <calcite-tab-nav slot="title-group">
-              <calcite-tab-title tab="boats" active>Boats</calcite-tab-title>
-              <calcite-tab-title tab="ships">Ships</calcite-tab-title>
-              <calcite-tab-title tab="yachts">Yachts</calcite-tab-title>
+              <calcite-tab-title tab="aaa" active>AAA</calcite-tab-title>
+              <calcite-tab-title tab="bbb">BBB</calcite-tab-title>
+              <calcite-tab-title tab="ccc">CCC</calcite-tab-title>
             </calcite-tab-nav>
-            <calcite-tab tab="boats" active>
-              Tab 1 content
+            <calcite-tab tab="aaa" active>
+              <calcite-panel>
+                AAA
+              </calcite-panel>
             </calcite-tab>
-            <calcite-tab tab="ships">
-              Tab 2 content
+            <calcite-tab tab="bbb">
+              <calcite-panel>
+                BBB
+              </calcite-panel>
             </calcite-tab>
-            <calcite-tab tab="yachts">
-              Tab 3 content
+            <calcite-tab tab="ccc">
+              <calcite-panel>
+                CCC
+              </calcite-panel>
             </calcite-tab>
           </calcite-tabs>
         
@@ -134,13 +117,13 @@
       </calcite-shell-panel>
       
       <!-- SHAREABLE ALERT -->
-      <calcite-alert id="app-share-alert" slot="alerts" icon="launch" placement="bottom" closable auto-close auto-close-duration="medium">
+      <calcite-alert id="app-share-alert" slot="alerts" kind="success" icon="launch" placement="bottom" auto-close auto-close-duration="medium">
         <div slot="message">Shareable link has been copied to the clipboard.</div>
-        <calcite-link id="app-share-link" slot="link" href="#" target="_blank" role="link" title="open in new tab">open in new tab</calcite-link>
+        <calcite-link slot="link" href="#" target="_blank" role="link" title="open in new tab">open in new tab</calcite-link>
       </calcite-alert>
       
       <!-- NOTICES ADN ALERTS -->
-      <calcite-alert id="app-notice" slot="alerts" icon="" placement="bottom" width="auto" closable color="red">
+      <calcite-alert id="app-notice" slot="alerts" kind="danger" placement="bottom" width="auto">
         <div slot="title"></div>
         <div slot="message"></div>
       </calcite-alert>
@@ -149,7 +132,7 @@
       <calcite-modal id="app-details-modal" slot="modals" kind="brand" scale="m" width="m" aria-labelledby="app-modal-title">
         <h3 slot="header" id="app-modal-title" class="application-title"></h3>
         <div slot="content" class="application-description"></div>
-        <div slot="secondary" class="margin-m">
+        <div slot="secondary">
           <calcite-label layout="inline">
             <span>hide on startup</span>
             <calcite-checkbox id="hide-startup-checkbox"></calcite-checkbox>
@@ -161,7 +144,7 @@
     </calcite-shell>
     
     <!-- LOADER -->
-    <calcite-loader id="app-loader" type="indeterminate" scale="l"></calcite-loader>
+    <calcite-loader id="app-loader" type="indeterminate" scale="l" text="...loading..."></calcite-loader>
   
   </body>
 </html>

@@ -63,6 +63,9 @@ class AppLoader {
       // ESRI CONFIG //
       require(['esri/config'], (esriConfig) => {
 
+        // CLEAR ERROR MESSAGE //
+        this.app.clearError();
+
         // SIGN IN MESSAGE //
         let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
 
@@ -117,7 +120,11 @@ class AppLoader {
               // LOAD PORTAL //
               this._loadPortal().then(() => {
                 resolve(signInMessage);
-              }).catch(reject);
+              }).catch((error) => {
+                esriId.destroyCredentials();
+                this.app.displayError({name: "Loading Error...", message: error.message});
+                this._load().then(resolve).catch(reject);
+              });
             });
           });
         }

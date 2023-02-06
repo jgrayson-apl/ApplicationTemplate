@@ -209,8 +209,8 @@ class Application extends AppBase {
 
         });
       } else {
-        this.displayAlert({
-          title: `Can't Find Layer`,
+        this.displayError({
+          name: `Can't Find Layer`,
           message: `The layer '${ layerTitle }' can't be found in this map.`
         });
       }

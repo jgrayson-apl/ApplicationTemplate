@@ -102,17 +102,21 @@ class AppBase extends AppConfig {
     const noticeTitleNode = appNotice.querySelector('[slot="title"]');
     const noticeMessageNode = appNotice.querySelector('[slot="message"]');
 
-    this.displayAlert = ({title, message}) => {
-      noticeTitleNode.innerHTML = title || 'Alert';
-      noticeMessageNode.innerHTML = message || 'Something went wrong.';
-      appNotice.active = true;
-    };
-
+    /**
+     *
+     * @param {Error|{name:string, message:string}} error
+     */
     this.displayError = (error) => {
       noticeTitleNode.innerHTML = error.name || 'Error';
-      noticeMessageNode.innerHTML = error.message || JSON.stringify(error, null, 2) || 'Something went wrong.';
-      appNotice.active = true;
+      noticeMessageNode.innerHTML = error.message || JSON.stringify(error, null, 2) || 'Something went wrong...';
+      appNotice.open = true;
       console.error(error);
+    };
+
+    this.clearError = () => {
+      noticeTitleNode.innerHTML = 'Error';
+      noticeMessageNode.innerHTML = 'Something went wrong...';
+      appNotice.open = false;
     };
 
   }
@@ -128,7 +132,7 @@ class AppBase extends AppConfig {
 
       // SHARE APPLICATION ALERT & LINK //
       const appShareAlert = document.getElementById('app-share-alert');
-      const appShareLink = document.getElementById('app-share-link');
+      const appShareLink = appShareAlert.querySelector('[slot="link"]');
 
       appShareAction.addEventListener('click', () => {
 

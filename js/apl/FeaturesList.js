@@ -39,7 +39,7 @@ class FeaturesList extends HTMLElement {
   static {
     FeaturesList.FEATURE_ITEM_TEMPLATE = document.createElement('template');
     FeaturesList.FEATURE_ITEM_TEMPLATE.innerHTML = `      
-      <calcite-pick-list-item
+      <calcite-list-item
         label=""
         description=""
         value="">        
@@ -47,10 +47,10 @@ class FeaturesList extends HTMLElement {
           slot="actions-end"
           label=""
           scale="s"
-          appearance="clear"
+          appearance="transparent"
           icon="blank">
         </calcite-action>
-      </calcite-pick-list-item>
+      </calcite-list-item>
     `;
   }
 
@@ -187,7 +187,7 @@ class FeaturesList extends HTMLElement {
       </style>
       <calcite-panel heading="Features List">
         <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>      
-        <calcite-pick-list filter-enabled="${ String(this.filterEnabled) }" selection-follows-focus></calcite-pick-list>        
+        <calcite-list filter-enabled="${ String(this.filterEnabled) }" selection-mode="single" selection-appearance="icon"</calcite-list>        
       </calcite-panel>           
     `;
 
@@ -212,16 +212,21 @@ class FeaturesList extends HTMLElement {
     });
 
     // LIST //
-    this.list = this.shadowRoot.querySelector('calcite-pick-list');
+    this.list = this.shadowRoot.querySelector('calcite-list');
 
     // SELECTION ACTIVITY //
     if (this.selectActivity !== FeaturesList.ACTIVITY.NONE) {
       // LIST SELECTION CHANGE //
-      this.list.addEventListener('calciteListChange', (evt) => {
-        if (evt.detail.size) {
-          let [selectionOID, selectedItem] = evt.detail.entries().next().value;
-          this._doActivity({activity: this.selectActivity, oid: Number(selectionOID), eventName: 'item-selected'});
-        }
+      this.list.addEventListener('calciteListItemSelect', () => {
+        requestAnimationFrame(() => {
+          const selectedItems = this.list.querySelectorAll("[selected]")
+          if(selectedItems?.length) {
+            const selectedItem = selectedItems[0];
+            this._doActivity({activity: this.selectActivity, oid: Number(selectedItem.value), eventName: 'item-selected'});
+          } else {
+            this.clearSelection();
+          }
+        });
       });
     }
 
@@ -345,7 +350,7 @@ class FeaturesList extends HTMLElement {
    */
   _createFeatureListItem({feature}) {
     const templateContent = FeaturesList.FEATURE_ITEM_TEMPLATE.content.cloneNode(true);
-    const featureListItem = templateContent.querySelector('calcite-pick-list-item');
+    const featureListItem = templateContent.querySelector('calcite-list-item');
 
     const {label, description, value} = this.getFeatureInfo(feature);
 
@@ -413,7 +418,7 @@ class FeaturesList extends HTMLElement {
     return new Promise((resolve, reject) => {
       require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-        const selectedItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
+        const selectedItem = this.list.querySelector(`calcite-list-item[value="${ featureOID }"]`);
         const action = selectedItem.querySelector('calcite-action');
         action.toggleAttribute('loading', true);
 
@@ -435,9 +440,7 @@ class FeaturesList extends HTMLElement {
    */
   clearSelection() {
     this.view.popup.close();
-    this.list.getSelectedItems().then((selectedItems) => {
-      selectedItems.forEach(item => { item.selected = false; });
-    });
+    this.list.selectedItems.forEach(selectedItem => selectedItem.selected = false);
   }
 
   /**
@@ -446,7 +449,7 @@ class FeaturesList extends HTMLElement {
    */
   updateSelection({featureOID}) {
     if (featureOID) {
-      const featureListItem = this.list.querySelector(`calcite-pick-list-item[value="${ featureOID }"]`);
+      const featureListItem = this.list.querySelector(`calcite-list-item[value="${ featureOID }"]`);
       if (featureListItem) {
         featureListItem.scrollIntoView({block: 'center', behavior: 'smooth'});
         featureListItem.selected = true;
