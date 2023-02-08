@@ -117,7 +117,9 @@ class AppLoader {
                 this.app.authMode = 'immediate';
               }
             }).then(() => {
+              //
               // LOAD PORTAL //
+              //
               this._loadPortal().then(() => {
                 resolve(signInMessage);
               }).catch((error) => {
