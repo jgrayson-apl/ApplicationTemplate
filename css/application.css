@@ -7,6 +7,8 @@ html, body {
   overflow: hidden;
 }
 
+/* Calcite Theme Editor: https://esrips.github.io/calcite-theme-editor/ */
+
 .calcite-mode-light,
 .calcite-mode-dark {
   --calcite-ui-brand: #00619b;
