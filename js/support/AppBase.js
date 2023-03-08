@@ -253,6 +253,28 @@ class AppBase extends AppConfig {
     });
 
   }
+  /**
+   * https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
+   * - create UUID / GUID
+   *
+   *  - four possible variations...
+   *     - id
+   *     - id.replace(/-/g,'')
+   *     - `{${ id }}`
+   *     = `{${ id.replace(/-/g,'') }}`
+   *
+   * @param {boolean} dashes
+   * @param {boolean} brackets
+   * @returns {string}
+   * @private
+   */
+  _createGUID(dashes = false, brackets = false) {
+    const url = URL.createObjectURL(new Blob());
+    const [id] = url.toString().split('/').reverse();
+    URL.revokeObjectURL(url);
+    const uuid = dashes ? id : id.replace(/-/g, '');
+    return brackets ? uuid : `{${ uuid }}`;
+  };
 
   /**
    * Example: setShadowElementStyle(diseaseInput, ".list-container", "maxHeight", "200px");

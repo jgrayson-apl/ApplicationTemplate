@@ -123,9 +123,12 @@ class AppLoader {
               this._loadPortal().then(() => {
                 resolve(signInMessage);
               }).catch((error) => {
-                esriId.destroyCredentials();
-                this.app.displayError({name: "Loading Error...", message: error.message});
-                this._load().then(resolve).catch(reject);
+
+                // TODO: MORE RESEARCH NEEDED //
+                // esriId.destroyCredentials();
+                // this.app.displayError({name: "Loading Error...", message: error.message});
+                // this._load().then(resolve).catch(reject);
+
               });
             });
           });

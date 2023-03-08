@@ -146,9 +146,9 @@ class SignIn extends HTMLElement {
           }).catch(this.displayError);
         }, {initial: true});
 
-        // CREDENTIAL CREATED AND WE DON'T HAVE USER //
+        // CREDENTIAL CREATED //
         esriId.on('credential-create', ({credential}) => {
-          credential && (!this.portal.user) && this.userSignIn();
+          credential ? this.userSignIn() : this.userSignOut();
         });
 
       });
