@@ -73,6 +73,8 @@ class AppConfig extends EventTarget {
 
         // SEARCH PARAMS //
         this._urlParams = new URLSearchParams(window.location.search);
+        this._urlParams.has('webmap') && (delete config.webscene);
+        this._urlParams.has('webscene') && (delete config.webmap);
 
         // APPLICATION CONFIG //
         Object.assign(this, config);
