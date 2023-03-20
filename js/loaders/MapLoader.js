@@ -19,10 +19,12 @@ class MapLoader {
   // CONFIG//
   config;
 
+  /**
+   *
+   * @param {{}} config
+   */
   constructor(config) {
-
     this.config = config;
-
   }
 
   /**
@@ -38,14 +40,14 @@ class MapLoader {
         if (this.config.webmap) {
           require(['esri/WebMap'], WebMap => {
             const map = new WebMap({portalItem: {id: itemID}});
-            map.loadAll().then(resolve).catch(reject);
+            map.load().then(resolve).catch(reject);
           });
         }
 
         if (this.config.webscene) {
           require(['esri/WebScene'], WebScene => {
             const map = new WebScene({portalItem: {id: itemID}});
-            map.loadAll().then(resolve).catch(reject);
+            map.load().then(resolve).catch(reject);
           });
         }
       } else {
