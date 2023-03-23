@@ -11,10 +11,36 @@ html, body {
 
 .calcite-mode-light,
 .calcite-mode-dark {
-  --calcite-ui-brand: #00619b;
-  --calcite-ui-brand-hover: #00304d;
-  --calcite-ui-brand-press: #77bde7;
-  --calcite-ui-icon-color: #00619b;
+  color-scheme: light;
+  --calcite-mode-name: light;
+  --calcite-ui-brand: #007AC2;
+  --calcite-ui-brand-hover: #00619B;
+  --calcite-ui-brand-press: #004974;
+  --calcite-ui-text-1: #151515;
+  --calcite-ui-text-2: #161616;
+  --calcite-ui-text-3: #191919;
+  --calcite-ui-text-highlight: #007AC2;
+  --calcite-ui-text-inverse: #ffffff;
+  --calcite-ui-text-link: #00619B;
+  --calcite-link-blue-underline: rgba(0, 122, 194, 0.5);
+  --calcite-ui-background: #F7F7F7;
+  --calcite-ui-foreground-1: #FFFFFF;
+  --calcite-ui-foreground-2: #F2F2F2;
+  --calcite-ui-foreground-3: #EDEDED;
+  --calcite-ui-inverse: #000000;
+  --calcite-ui-inverse-hover: #000000;
+  --calcite-ui-inverse-press: #000000;
+  --calcite-ui-border-1: #CACACA;
+  --calcite-ui-border-2: #D4D4D4;
+  --calcite-ui-border-3: #DFDFDF;
+  --calcite-ui-border-input: #959595;
+  --calcite-ui-icon-color: currentColor;
+  --calcite-ui-info: #00619B;
+  --calcite-ui-success: #308e29;
+  --calcite-ui-warning: #f1c21b;
+  --calcite-ui-danger: #D83020;
+  --calcite-ui-danger-hover: #A82B1E;
+  --calcite-ui-danger-press: #7C1D13;
 }
 
 .esri-widget,
