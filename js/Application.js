@@ -75,7 +75,7 @@ class Application extends AppBase {
    *
    * @param view
    */
-  configView(view) {
+  configView({view}) {
     return new Promise((resolve, reject) => {
       if (view) {
         require([
@@ -143,9 +143,9 @@ class Application extends AppBase {
   applicationReady({portal, group, map, view}) {
     return new Promise(async (resolve, reject) => {
       // VIEW READY //
-      this.configView(view).then(() => {
+      this.configView({view}).then(() => {
 
-        this.displayFeatureList(view);
+        this.displayFeatureList({view});
 
         resolve();
       }).catch(reject);
@@ -156,7 +156,7 @@ class Application extends AppBase {
    *
    * @param view
    */
-  displayFeatureList(view) {
+  displayFeatureList({view}) {
     if (view) {
 
       const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
