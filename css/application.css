@@ -106,7 +106,7 @@ calcite-modal [slot="secondary"] calcite-label {
   justify-content: space-between;
 }
 
-.content-center {
+/*.content-center {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -126,24 +126,26 @@ calcite-modal [slot="secondary"] calcite-label {
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
-}
+}*/
 
 #center-container {
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 0;
-  min-height: 0;
+  height: 100%;
   padding: 0;
   margin: 0;
-  width: 100%;
-  height: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
 }
 
+calcite-shell[content-behind] #center-container {
+  margin: 0 50px 0 50px;
+}
+
+
 #view-container {
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 0;
-  min-height: 0;
+  padding: 0;
+  margin: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
 }
