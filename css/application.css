@@ -60,6 +60,11 @@ html, body {
   background-color: var(--calcite-ui-foreground-1) !important;
 }
 
+.esri-layer-list__item {
+  border-color: var(--calcite-ui-border-2);
+  background-color: transparent !important;
+}
+
 header[slot="header"] {
   padding: 0 0.5rem 0 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
