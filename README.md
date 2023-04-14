@@ -24,8 +24,8 @@ Update the parameters in ./config/application.json file in your favorite json ed
 | **oauthappid** | The OAuth ID of the Web Application item                          |
 |   **authMode** | For public access set to 'anonymous' (and set oauthappid to null) |
 |     **apiKey** | ArcGIS Platform API key                                           |
-|     **webmap** | The item id of the web map (only use webmap OR webscene)          |
-|   **webscene** | The item id of the web scene (only use webmap OR webscene)        |
+|     **webmap** | The item id of the web map                                        |
+|   **webscene** | The item id of the web scene                                      |
 |  **viewProps** | Additional view properties.                                       | 
 |  **shareable** | List of shareable properties                                      |
 
