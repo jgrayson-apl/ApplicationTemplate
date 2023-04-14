@@ -219,8 +219,8 @@ class FeaturesList extends HTMLElement {
       // LIST SELECTION CHANGE //
       this.list.addEventListener('calciteListItemSelect', () => {
         requestAnimationFrame(() => {
-          const selectedItems = this.list.querySelectorAll("[selected]")
-          if(selectedItems?.length) {
+          const selectedItems = this.list.querySelectorAll("[selected]");
+          if (selectedItems?.length) {
             const selectedItem = selectedItems[0];
             this._doActivity({activity: this.selectActivity, oid: Number(selectedItem.value), eventName: 'item-selected'});
           } else {

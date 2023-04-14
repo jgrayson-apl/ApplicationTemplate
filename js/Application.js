@@ -84,8 +84,9 @@ class Application extends AppBase {
           'esri/widgets/Home',
           'esri/widgets/Search',
           'esri/widgets/LayerList',
+          'esri/widgets/BasemapLayerList',
           'esri/widgets/Legend'
-        ], (reactiveUtils, Popup, Home, Search, LayerList, Legend) => {
+        ], (reactiveUtils, Popup, Home, Search, LayerList, BasemapLayerList, Legend) => {
 
           // VIEW AND POPUP //
           view.set({
@@ -104,22 +105,50 @@ class Application extends AppBase {
           const home = new Home({view});
           view.ui.add(home, {position: 'top-left', index: 0});
 
-          // LEGEND //
-          const legend = new Legend({
-            container: 'legend-container',
-            view: view
-          });
-          //view.ui.add(legend, {position: 'bottom-left', index: 0});
-
           // SEARCH //
           const search = new Search({view: view});
           view.ui.add(search, {position: 'top-right', index: 0});
 
+          // LEGEND //
+          const legend = new Legend({
+            container: 'legend-container',
+            view: view
+            //basemapLegendVisible: true
+          });
+          //view.ui.add(legend, {position: 'bottom-left', index: 0});
+
+          // BASEMAP LAYER LIST //
+          const basemapReferenceLayerList = new BasemapLayerList({
+            container: 'basemap-reference-layers-container',
+            view: view,
+            visibleElements: {
+              referenceLayers: true,
+              baseLayers: false,
+              errors: true,
+              statusIndicators: true
+            }
+          });
+
           // LAYER LIST //
           const layerList = new LayerList({
-            container: 'layer-list-container',
+            container: 'layers-container',
             view: view,
-            visibleElements: {statusIndicators: true}
+            visibleElements: {
+              errors: true,
+              statusIndicators: true
+            }
+          });
+
+          // BASEMAP LAYER LIST //
+          const basemapBaseLayerList = new BasemapLayerList({
+            container: 'basemap-base-layers-container',
+            view: view,
+            visibleElements: {
+              referenceLayers: false,
+              baseLayers: true,
+              errors: true,
+              statusIndicators: true
+            }
           });
 
           // VIEW LOADING INDICATOR //
@@ -217,8 +246,6 @@ class Application extends AppBase {
 
     }
   }
-
-
 
 }
 

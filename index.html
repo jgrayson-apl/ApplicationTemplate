@@ -14,12 +14,8 @@
     <!--<meta property="og:image" content="https://geoxc-apps.bd.esri.com/.../assets/app.png">-->
     
     <!-- CHARTJS -- https://www.chartjs.org/ -->
-    <!-- 3.9.1 -->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0/dist/chartjs-plugin-datalabels.min.js"></script>-->
-    <!--https://github.com/chartjs/chartjs-plugin-datalabels-->
-    <!-- 4.1.2 -->
-    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.min.js"></script>-->
+    <!-- 4.2.1 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
     <script type="module" src="https://js.arcgis.com/calcite-components/1.2.0/calcite.esm.js"></script>
@@ -58,7 +54,17 @@
         <calcite-panel heading="Map" class="toggle-panel" data-toggle="map">
           <calcite-block heading="Layers" collapsible open>
             <calcite-icon slot="icon" icon="layers"></calcite-icon>
-            <div id="layer-list-container"></div>
+            
+            <calcite-block-section text="Reference">
+              <div id="basemap-reference-layers-container"></div>
+            </calcite-block-section>
+            <calcite-block-section text="Operational">
+              <div id="layers-container"></div>
+            </calcite-block-section>
+            <calcite-block-section text="Base">
+              <div id="basemap-base-layers-container"></div>
+            </calcite-block-section>
+          
           </calcite-block>
           <calcite-block heading="Legend" collapsible>
             <calcite-icon slot="icon" icon="legend"></calcite-icon>
