@@ -226,7 +226,8 @@ class AppLoader {
         const viewProperties = cleanParams({
           container: this.app.container,
           snapToZoom: Number.isInteger(zoom),
-          map, center, zoom, rotation
+          map, center, zoom, rotation,
+          ...this.app.viewProps || {}
         });
 
         const viewLoader = new ViewLoader(viewProperties);
