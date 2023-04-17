@@ -65,6 +65,11 @@ html, body {
   background-color: transparent !important;
 }
 
+.esri-basemap-layer-list .esri-widget__heading {
+  display: none;
+}
+
+
 header[slot="header"] {
   padding: 0 0.5rem 0 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
