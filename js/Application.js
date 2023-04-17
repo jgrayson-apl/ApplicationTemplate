@@ -109,14 +109,6 @@ class Application extends AppBase {
           const search = new Search({view: view});
           view.ui.add(search, {position: 'top-right', index: 0});
 
-          // LEGEND //
-          const legend = new Legend({
-            container: 'legend-container',
-            view: view
-            //basemapLegendVisible: true
-          });
-          //view.ui.add(legend, {position: 'bottom-left', index: 0});
-
           // BASEMAP LAYER LIST //
           const basemapReferenceLayerList = new BasemapLayerList({
             container: 'basemap-reference-layers-container',
@@ -150,6 +142,12 @@ class Application extends AppBase {
               statusIndicators: true
             }
           });
+
+          // LEGEND //
+          const legend = new Legend({
+            container: 'legend-container', view: view  //basemapLegendVisible: true
+          });
+          //view.ui.add(legend, {position: 'bottom-left', index: 0});
 
           // VIEW LOADING INDICATOR //
           const viewLoading = new ViewLoading({view: view});
