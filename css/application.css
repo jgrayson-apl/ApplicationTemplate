@@ -54,6 +54,7 @@ html, body {
 }
 
 .esri-button,
+.esri-input,
 .esri-popup__button,
 .esri-widget--button {
   color: var(--calcite-ui-icon-color) !important;
