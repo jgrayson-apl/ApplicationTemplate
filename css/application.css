@@ -10,7 +10,8 @@ html, body {
 /* Calcite Theme Editor: https://esrips.github.io/calcite-theme-editor/ */
 
 .calcite-mode-light,
-.calcite-mode-dark {
+.calcite-mode-dark,
+.app-theme {
   color-scheme: light;
   --calcite-mode-name: light;
   --calcite-ui-brand: #007AC2;
