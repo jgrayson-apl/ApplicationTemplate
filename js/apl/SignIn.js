@@ -184,7 +184,7 @@ class SignIn extends HTMLElement {
           this.portalInfoUsername.innerHTML = this.portal.user.username;
           this.portalInfoName.innerHTML = this.portal.name;
 
-          const organizationUrl = `https://${ this.portal.urlKey }.${ this.portal.customBaseUrl }/`;
+          const organizationUrl = this.portal.urlKey ? `https://${ this.portal.urlKey }.${ this.portal.customBaseUrl }/` : this.portal.url;
           this.portalInfoUrl.innerHTML = organizationUrl;
           this.portalInfoUrl.href = organizationUrl;
 
