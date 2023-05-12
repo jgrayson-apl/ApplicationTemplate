@@ -69,6 +69,9 @@ class AppLoader {
         // SIGN IN MESSAGE //
         let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
 
+        // REQUIRES AUTHENTICATION //
+        let requiresAuthentication = false;
+
         // PORTAL URL //
         if (this.app?.portalUrl) {
           esriConfig.portalUrl = this.app.portalUrl;
@@ -78,6 +81,7 @@ class AppLoader {
         // API KEY //
         //
         if (this.app?.apiKey) {
+          requiresAuthentication = true;
 
           // CONFIGURE APIKEY //
           esriConfig.apiKey = this.app.apiKey;
@@ -97,6 +101,7 @@ class AppLoader {
             // OAUTH //
             //
             if (this.app?.oauthappid) {
+              requiresAuthentication = true;
               signInMessage = `Application created via OAuth. [ ${ (new Date()).toLocaleString() } ]`;
 
               // CONFIGURE OAUTH //
@@ -106,16 +111,13 @@ class AppLoader {
                 popup: true
               });
               esriId.registerOAuthInfos([oauthInfo]);
-
             }
 
             // CHECK SIGN-IN STATUS //
             esriId.checkSignInStatus(portalSharingURL).then(() => {
               return esriId.getCredential(portalSharingURL);
-            }).catch(() => {
-              if (this.app.authMode !== 'anonymous') {
-                this.app.authMode = 'immediate';
-              }
+            }).catch((error) => {
+              requiresAuthentication && (this.app.authMode = 'immediate');
             }).then(() => {
               //
               // LOAD PORTAL //
