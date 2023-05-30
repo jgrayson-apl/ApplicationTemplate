@@ -18,8 +18,8 @@
     <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.3.0/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.3.0/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.1/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.1/calcite.css"/>
     
     <!-- ArcGIS API for JavaScript-->
     <link href="https://js.arcgis.com/4.26/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
@@ -32,17 +32,24 @@
   <body class="calcite-mode-light">
     <calcite-shell>
       
-      <header class="content-row" slot="header">
-        <h2 class="content-row">
-          <calcite-icon class="application-icon" icon="add-in" scale="l"></calcite-icon>
-          <span class="application-title"></span>
-        </h2>
-        <calcite-action-bar layout="horizontal" expand-disabled="true">
+      <!-- HEADER -->
+      <calcite-navigation slot="header">
+        <!--<calcie-navigation-logo slot="logo"></calcie-navigation-logo>-->
+        
+        <calcite-icon slot="content-start" class="application-icon" icon="add-in" scale="l"></calcite-icon>
+        <h2 slot="content-start" class="application-title"></h2>
+        
+        <calcite-action-bar slot="content-end" layout="horizontal" expand-disabled="true">
+          
           <div id="sign-in-container"></div>
+          
           <calcite-action id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
           <calcite-action id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
         </calcite-action-bar>
-      </header>
+        
+        <!--<calcite-navigation-user slot="user" user-id="jgrayson" username="jgrayson" full-name="John Grayson"></calcite-navigation-user>-->
+        
+      </calcite-navigation>
       
       <!-- LEFT -->
       <calcite-shell-panel slot="panel-start" position="start" width-scale="m" collapsed="true">
