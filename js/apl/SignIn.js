@@ -61,11 +61,11 @@ class SignIn extends HTMLElement {
       </style>      
       <calcite-dropdown width="auto" type="click" placement="bottom-end">      
         <div slot="trigger">
-          <calcite-button class="status-btn" appearance="outline-fill" kind="neutral" icon-start="sign-in">Sign In</calcite-button>
+          <calcite-button class="status-btn" appearance="transparent" kind="neutral" icon-start="sign-in" scale="l">Sign In</calcite-button>
           <calcite-navigation-user class="user-nav" hidden></calcite-navigation-user>
         </div>                
         <calcite-dropdown-group selection-mode="none">          
-          <calcite-dropdown-item class="info">
+          <calcite-dropdown-item class="portal-item" target="_blank" href="#">
             <calcite-navigation-user class="portal-nav"></calcite-navigation-user>                      
           </calcite-dropdown-item>          
         </calcite-dropdown-group>        
@@ -82,17 +82,11 @@ class SignIn extends HTMLElement {
    */
   connectedCallback() {
 
+    this.userStatusBtn = this.shadowRoot.querySelector('.status-btn');
     this.userNav = this.shadowRoot.querySelector('.user-nav');
     this.portalNav = this.shadowRoot.querySelector('.portal-nav');
-    this.userStatusBtn = this.shadowRoot.querySelector('.status-btn');
-    this.portalInfoItem = this.shadowRoot.querySelector('.info');
+    this.portalItem = this.shadowRoot.querySelector('.portal-item');
     this.userSignOutItem = this.shadowRoot.querySelector('.sign-out');
-
-    // OPEN PORTAL URL //
-    this.portalInfoItem.addEventListener('click', () => {
-      const portalUrl = this.portalNav.getAttribute('username');
-      portalUrl && window.open(portalUrl);
-    });
 
     // BIND METHODS //
     this.updateUserUI = this.updateUserUI.bind(this);
@@ -141,12 +135,11 @@ class SignIn extends HTMLElement {
       if (this.portal) {
         const hasUser = (this.portal.user != null);
 
-        this.portalInfoItem && (this.portalInfoItem.hidden = !hasUser);
+        this.portalItem && (this.portalItem.hidden = !hasUser);
         this.userSignOutItem && (this.userSignOutItem.hidden = !hasUser);
+        this.userStatusBtn && (this.userStatusBtn.hidden = hasUser);
 
         if (hasUser) {
-
-          this.userStatusBtn.toggleAttribute('hidden', true);
 
           this.userNav.setAttribute('user-id', this.portal.user.username);
           this.userNav.setAttribute('username', this.portal.user.username);
@@ -162,6 +155,8 @@ class SignIn extends HTMLElement {
           this.portalNav.setAttribute('full-name', this.portal.name);
           this.portalNav.setAttribute('thumbnail', orgThumbUrl);
 
+          this.portalItem.setAttribute('href', organizationUrl);
+
         } else {
 
           this.userNav.setAttribute('full-name', '');
@@ -170,7 +165,7 @@ class SignIn extends HTMLElement {
           this.userNav.setAttribute('thumbnail', '');
           this.userNav.toggleAttribute('hidden', true);
 
-          this.userStatusBtn.toggleAttribute('hidden', false);
+          this.portalItem.setAttribute('href', '#');
         }
 
         resolve();
@@ -188,8 +183,9 @@ class SignIn extends HTMLElement {
   userSignIn() {
     return new Promise((resolve, reject) => {
       require(['esri/portal/Portal'], (Portal) => {
-        this.portal = new Portal({authMode: 'immediate'});
-        this.portal.load().then(() => {
+        const portal = new Portal({authMode: 'immediate'});
+        portal.load().then(() => {
+          this.portal = portal;
           this.updateUserUI().then(resolve);
         }).catch(reject).then();
       });
