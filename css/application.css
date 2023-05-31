@@ -76,9 +76,12 @@ calcite-navigation[slot="header"] {
   --calcite-navigation-border-color: var(--calcite-ui-brand);
 }
 
-calcite-navigation [slot="content-start"] {
-  padding: 0 0.5rem;
+calcite-navigation[slot="header"] [slot="content-start"] {
   align-self: center;
+}
+
+calcite-navigation[slot="header"] [slot] {
+  margin: 0 0.5rem;
 }
 
 .application-title {
@@ -112,28 +115,6 @@ calcite-modal [slot="secondary"] calcite-label {
   flex-direction: column;
   justify-content: space-between;
 }
-
-/*.content-center {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-content: center;
-}
-
-.content-static {
-  flex-grow: 0;
-  flex-shrink: 0;
-  min-width: 0;
-  min-height: 0;
-}
-
-.content-fill {
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-}*/
 
 #center-container {
   height: 100%;

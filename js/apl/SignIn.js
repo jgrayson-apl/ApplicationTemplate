@@ -44,7 +44,7 @@ class SignIn extends HTMLElement {
    * @param {HTMLElement} container
    * @param {Portal} portal
    */
-  constructor({container , portal}) {
+  constructor({container, portal}) {
     super();
 
     this.container = container;
@@ -53,23 +53,27 @@ class SignIn extends HTMLElement {
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
       <style>
+        :host {
+          height: 100%;
+          display: inline-flex;
+          align-items: center;
+        }
+        /*:host [slot="trigger"] {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }*/
+        :host .signIn-portal-container {
+          --calcite-label-margin-bottom: 0;
+        }        
         :host .signIn-info-content {
           display:flex;
           flex-direction:row;
           align-items:center;
-        }              
-        :host .signIn-info-user {
-          display:flex;
-          flex-direction:column;
-          padding-left:10px;
-        }
-        :host .signIn-username {
-          margin-bottom: 4px; 
-          --calcite-ui-text-1: var(--calcite-ui-brand);               
-        }
-        :host .signIn-portal-name {
-          margin-bottom: 4px;   
-          --calcite-font-size--1: 11pt;            
+          gap: 0.5rem;
+        }        
+        :host .signIn-portal-name {          
+          /*--calcite-font-size--1: 11pt;*/            
         }
         :host .signIn-avatar {
           box-shadow: 0 1px 2px rgba(0,0,0,0.3);
@@ -78,21 +82,24 @@ class SignIn extends HTMLElement {
           --calcite-ui-text-link: var(--calcite-ui-brand);
         }      
       </style>      
-      <calcite-dropdown width="auto" type="click" placement="bottom-end">                
-        <calcite-action slot="trigger" class="signIn-status-btn" text-enabled text="not signed in" appearance="transparent" icon="user"></calcite-action>        
+      <calcite-dropdown width="auto" type="click" placement="bottom-end">
+      
+        <div slot="trigger">
+          <calcite-button class="signIn-status-btn" appearance="outline-fill" kind="neutral" icon-start="sign-in">Sign In</calcite-button>
+          <calcite-navigation-user hidden></calcite-navigation-user>
+        </div>
+                
         <calcite-dropdown-group selection-mode="none">          
           <calcite-dropdown-item class="signIn-info">
             <div class="signIn-info-content">        
-              <calcite-avatar class="signIn-avatar" scale="l" username="" thumbnail=""></calcite-avatar>
-              <div class="signIn-info-user">
-                <calcite-label class="signIn-username"></calcite-label>
-                <calcite-label class="signIn-portal-name"></calcite-label>
+              <calcite-avatar class="signIn-avatar" thumbnail=""></calcite-avatar>                              
+              <calcite-label class="signIn-portal-container">
+                <div class="signIn-portal-name"></div>
                 <calcite-link class="signIn-portal-url" target="_blank"></calcite-link>
-              </div>
+              </calcite-label>
             </div>
           </calcite-dropdown-item>          
-        </calcite-dropdown-group>
-        <calcite-dropdown-item class="signIn-sign-in" icon-start="sign-in">Sign In</calcite-dropdown-item>
+        </calcite-dropdown-group>        
         <calcite-dropdown-item class="signIn-sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
       </calcite-dropdown>
     `;
@@ -106,14 +113,14 @@ class SignIn extends HTMLElement {
    */
   connectedCallback() {
 
+    this.userNav = this.shadowRoot.querySelector('calcite-navigation-user');
+
     // UI ELEMENTS //
     this.userStatusBtn = this.shadowRoot.querySelector('.signIn-status-btn');
     this.avatar = this.shadowRoot.querySelector('.signIn-avatar');
     this.portalInfoItem = this.shadowRoot.querySelector('.signIn-info');
-    this.portalInfoUsername = this.shadowRoot.querySelector('.signIn-username');
     this.portalInfoName = this.shadowRoot.querySelector('.signIn-portal-name');
     this.portalInfoUrl = this.shadowRoot.querySelector('.signIn-portal-url');
-    this.userSignInItem = this.shadowRoot.querySelector('.signIn-sign-in');
     this.userSignOutItem = this.shadowRoot.querySelector('.signIn-sign-out');
 
     // OPEN PORTAL URL //
@@ -137,7 +144,7 @@ class SignIn extends HTMLElement {
     if (this.portal) {
       require(['esri/identity/IdentityManager', 'esri/core/reactiveUtils'], (esriId, reactiveUtils) => {
 
-        this.userSignInItem && this.userSignInItem.addEventListener('click', this.userSignIn);
+        this.userStatusBtn && this.userStatusBtn.addEventListener('click', this.userSignIn);
         this.userSignOutItem && this.userSignOutItem.addEventListener('click', this.userSignOut);
 
         reactiveUtils.watch(() => this.portal.user, (user) => {
@@ -174,26 +181,46 @@ class SignIn extends HTMLElement {
 
         if (hasUser) {
 
-          const firstName = this.portal.user.fullName.split(' ')[0];
+          // const firstName = this.portal.user.fullName.split(' ')[0];
           //this.userStatusBtn.innerHTML = `${ firstName } (${ this.portal.name })`;
-          this.userStatusBtn.setAttribute('text', `${ firstName } (${ this.portal.name })`);
-          this.userStatusBtn.title = this.portal.user.fullName;
-          this.avatar.thumbnail = this.portal.user.thumbnailUrl;
-          this.avatar.username = this.portal.user.username;
+          // this.userStatusBtn.setAttribute('text', `${ firstName } (${ this.portal.name })`);
+          // this.userStatusBtn.title = this.portal.user.fullName;
+          // this.avatar.thumbnail = this.portal.user.thumbnailUrl;
+          // this.avatar.username = this.portal.user.username;
 
-          this.portalInfoUsername.innerHTML = this.portal.user.username;
+          this.userNav.setAttribute('full-name', this.portal.user.fullName);
+          this.userNav.setAttribute('username', this.portal.user.username);
+          this.userNav.setAttribute('user-id', this.portal.user.username);
+          this.userNav.setAttribute('thumbnail', this.portal.user.thumbnailUrl);
+          this.userNav.toggleAttribute('hidden', false);
+
+          this.userStatusBtn.toggleAttribute('hidden',true);
+
           this.portalInfoName.innerHTML = this.portal.name;
 
           const organizationUrl = this.portal.urlKey ? `https://${ this.portal.urlKey }.${ this.portal.customBaseUrl }/` : this.portal.url;
           this.portalInfoUrl.innerHTML = organizationUrl;
           this.portalInfoUrl.href = organizationUrl;
 
+          this.avatar.username = this.portal.name;
+          this.avatar.thumbnail = `${organizationUrl}/sharing/rest/portals/self/resources/${this.portal.thumbnail}`;
+
         } else {
           //this.userStatusBtn.innerHTML = 'not signed in';
-          this.userStatusBtn.setAttribute('text','not signed in');
-          this.userStatusBtn.title = '';
-          this.avatar.thumbnail = null;
-          this.portalInfoUsername.innerHTML = '';
+          // this.userStatusBtn.setAttribute('text','not signed in');
+          // this.userStatusBtn.title = '';
+
+          this.userNav.setAttribute('full-name', '');
+          this.userNav.setAttribute('username', '');
+          this.userNav.setAttribute('user-id', '');
+          this.userNav.setAttribute('thumbnail', '');
+          this.userNav.toggleAttribute('hidden', true);
+
+          this.userStatusBtn.toggleAttribute('hidden',false);
+
+          this.avatar.username = '';
+          this.avatar.thumbnail = '';
+
           this.portalInfoName.innerHTML = '';
           this.portalInfoUrl.innerHTML = '';
           this.portalInfoUrl.href = '';
