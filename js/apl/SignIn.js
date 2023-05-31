@@ -57,50 +57,19 @@ class SignIn extends HTMLElement {
           height: 100%;
           display: inline-flex;
           align-items: center;
-        }
-        /*:host [slot="trigger"] {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-        }*/
-        :host .signIn-portal-container {
-          --calcite-label-margin-bottom: 0;
-        }        
-        :host .signIn-info-content {
-          display:flex;
-          flex-direction:row;
-          align-items:center;
-          gap: 0.5rem;
-        }        
-        :host .signIn-portal-name {          
-          /*--calcite-font-size--1: 11pt;*/            
-        }
-        :host .signIn-avatar {
-          box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }      
-        :host .signIn-portal-url {
-          --calcite-ui-text-link: var(--calcite-ui-brand);
-        }      
+        }    
       </style>      
-      <calcite-dropdown width="auto" type="click" placement="bottom-end">
-      
+      <calcite-dropdown width="auto" type="click" placement="bottom-end">      
         <div slot="trigger">
-          <calcite-button class="signIn-status-btn" appearance="outline-fill" kind="neutral" icon-start="sign-in">Sign In</calcite-button>
-          <calcite-navigation-user hidden></calcite-navigation-user>
-        </div>
-                
+          <calcite-button class="status-btn" appearance="outline-fill" kind="neutral" icon-start="sign-in">Sign In</calcite-button>
+          <calcite-navigation-user class="user-nav" hidden></calcite-navigation-user>
+        </div>                
         <calcite-dropdown-group selection-mode="none">          
-          <calcite-dropdown-item class="signIn-info">
-            <div class="signIn-info-content">        
-              <calcite-avatar class="signIn-avatar" thumbnail=""></calcite-avatar>                              
-              <calcite-label class="signIn-portal-container">
-                <div class="signIn-portal-name"></div>
-                <calcite-link class="signIn-portal-url" target="_blank"></calcite-link>
-              </calcite-label>
-            </div>
+          <calcite-dropdown-item class="info">
+            <calcite-navigation-user class="portal-nav"></calcite-navigation-user>                      
           </calcite-dropdown-item>          
         </calcite-dropdown-group>        
-        <calcite-dropdown-item class="signIn-sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
+        <calcite-dropdown-item class="sign-out" icon-start="sign-out" hidden>Sign Out</calcite-dropdown-item>
       </calcite-dropdown>
     `;
 
@@ -113,19 +82,16 @@ class SignIn extends HTMLElement {
    */
   connectedCallback() {
 
-    this.userNav = this.shadowRoot.querySelector('calcite-navigation-user');
-
-    // UI ELEMENTS //
-    this.userStatusBtn = this.shadowRoot.querySelector('.signIn-status-btn');
-    this.avatar = this.shadowRoot.querySelector('.signIn-avatar');
-    this.portalInfoItem = this.shadowRoot.querySelector('.signIn-info');
-    this.portalInfoName = this.shadowRoot.querySelector('.signIn-portal-name');
-    this.portalInfoUrl = this.shadowRoot.querySelector('.signIn-portal-url');
-    this.userSignOutItem = this.shadowRoot.querySelector('.signIn-sign-out');
+    this.userNav = this.shadowRoot.querySelector('.user-nav');
+    this.portalNav = this.shadowRoot.querySelector('.portal-nav');
+    this.userStatusBtn = this.shadowRoot.querySelector('.status-btn');
+    this.portalInfoItem = this.shadowRoot.querySelector('.info');
+    this.userSignOutItem = this.shadowRoot.querySelector('.sign-out');
 
     // OPEN PORTAL URL //
     this.portalInfoItem.addEventListener('click', () => {
-      this.portalInfoUrl.href && window.open(this.portalInfoUrl.href);
+      const portalUrl = this.portalNav.getAttribute('username');
+      portalUrl && window.open(portalUrl);
     });
 
     // BIND METHODS //
@@ -176,39 +142,27 @@ class SignIn extends HTMLElement {
         const hasUser = (this.portal.user != null);
 
         this.portalInfoItem && (this.portalInfoItem.hidden = !hasUser);
-        this.userSignInItem && (this.userSignInItem.hidden = hasUser);
         this.userSignOutItem && (this.userSignOutItem.hidden = !hasUser);
 
         if (hasUser) {
 
-          // const firstName = this.portal.user.fullName.split(' ')[0];
-          //this.userStatusBtn.innerHTML = `${ firstName } (${ this.portal.name })`;
-          // this.userStatusBtn.setAttribute('text', `${ firstName } (${ this.portal.name })`);
-          // this.userStatusBtn.title = this.portal.user.fullName;
-          // this.avatar.thumbnail = this.portal.user.thumbnailUrl;
-          // this.avatar.username = this.portal.user.username;
+          this.userStatusBtn.toggleAttribute('hidden', true);
 
-          this.userNav.setAttribute('full-name', this.portal.user.fullName);
-          this.userNav.setAttribute('username', this.portal.user.username);
           this.userNav.setAttribute('user-id', this.portal.user.username);
+          this.userNav.setAttribute('username', this.portal.user.username);
+          this.userNav.setAttribute('full-name', this.portal.user.fullName);
           this.userNav.setAttribute('thumbnail', this.portal.user.thumbnailUrl);
           this.userNav.toggleAttribute('hidden', false);
 
-          this.userStatusBtn.toggleAttribute('hidden',true);
-
-          this.portalInfoName.innerHTML = this.portal.name;
-
           const organizationUrl = this.portal.urlKey ? `https://${ this.portal.urlKey }.${ this.portal.customBaseUrl }/` : this.portal.url;
-          this.portalInfoUrl.innerHTML = organizationUrl;
-          this.portalInfoUrl.href = organizationUrl;
+          const orgThumbUrl = `${ organizationUrl }/sharing/rest/portals/self/resources/${ this.portal.thumbnail }`;
 
-          this.avatar.username = this.portal.name;
-          this.avatar.thumbnail = `${organizationUrl}/sharing/rest/portals/self/resources/${this.portal.thumbnail}`;
+          this.portalNav.setAttribute('user-id', this.portal.id);
+          this.portalNav.setAttribute('username', organizationUrl);
+          this.portalNav.setAttribute('full-name', this.portal.name);
+          this.portalNav.setAttribute('thumbnail', orgThumbUrl);
 
         } else {
-          //this.userStatusBtn.innerHTML = 'not signed in';
-          // this.userStatusBtn.setAttribute('text','not signed in');
-          // this.userStatusBtn.title = '';
 
           this.userNav.setAttribute('full-name', '');
           this.userNav.setAttribute('username', '');
@@ -216,14 +170,7 @@ class SignIn extends HTMLElement {
           this.userNav.setAttribute('thumbnail', '');
           this.userNav.toggleAttribute('hidden', true);
 
-          this.userStatusBtn.toggleAttribute('hidden',false);
-
-          this.avatar.username = '';
-          this.avatar.thumbnail = '';
-
-          this.portalInfoName.innerHTML = '';
-          this.portalInfoUrl.innerHTML = '';
-          this.portalInfoUrl.href = '';
+          this.userStatusBtn.toggleAttribute('hidden', false);
         }
 
         resolve();
