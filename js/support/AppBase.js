@@ -35,11 +35,27 @@ class AppBase extends AppConfig {
   set title(value) {
     this._title = value;
     document.querySelectorAll('.application-title').forEach(node => { node.innerHTML = this._title; });
+    const navLogo = document.querySelector('calcite-navigation-logo[slot="logo"]');
+    navLogo?.setAttribute('heading', this._title);
     this.dispatchEvent(new CustomEvent('title-change', {detail: {title: this._title}}));
   }
 
   get title() {
     return this._title;
+  }
+
+  // APP SNIPPET //
+  _snippet = null;
+  set snippet(value) {
+    this._snippet = value;
+    document.querySelectorAll('.application-snippet').forEach(node => { node.innerHTML = this._snippet; });
+    const navLogo = document.querySelector('calcite-navigation-logo[slot="logo"]');
+    navLogo?.setAttribute('description', this._snippet);
+    this.dispatchEvent(new CustomEvent('description-change', {detail: {description: this._snippet}}));
+  }
+
+  get snippet() {
+    return this._snippet;
   }
 
   // APP DESCRIPTION //
@@ -217,10 +233,13 @@ class AppBase extends AppConfig {
   setApplicationDetails({map = null, group = null}) {
 
     // APP TITLE //
-    this.title = this.title?.length ? this.title : (map?.portalItem?.title || 'Application');
+    this.title = this.title?.length ? this.title : (map?.portalItem?.title || 'Application Title');
+
+    // APP SNIPPET //
+    this.snippet = this.snippet?.length ? this.description : (map?.portalItem?.snippet || group?.snippet || '[missing snippet]');
 
     // APP DESCRIPTION //
-    this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '...');
+    this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '[missing description]');
 
   }
 
@@ -253,6 +272,7 @@ class AppBase extends AppConfig {
     });
 
   }
+
   /**
    * https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
    * - create UUID / GUID

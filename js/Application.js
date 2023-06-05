@@ -39,14 +39,14 @@ class Application extends AppBase {
         // PORTAL //
         this.portal = portal;
 
+        // SET APPLICATION DETAILS //
+        this.setApplicationDetails({map, group});
+
         // VIEW SHAREABLE URL PARAMETERS //
         this.initializeViewShareable({view});
 
         // USER SIGN-IN //
         this.configUserSignIn();
-
-        // SET APPLICATION DETAILS //
-        this.setApplicationDetails({map, group});
 
         // APPLICATION //
         this.applicationReady({portal, group, map, view}).catch(this.displayError).then(() => {

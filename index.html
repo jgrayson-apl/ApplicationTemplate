@@ -18,8 +18,8 @@
     <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.1/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.1/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css"/>
     
     <!-- ArcGIS API for JavaScript-->
     <link href="https://js.arcgis.com/4.26/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
@@ -34,18 +34,15 @@
       
       <!-- HEADER -->
       <calcite-navigation slot="header">
-        <!--<calcie-navigation-logo slot="logo"></calcie-navigation-logo>-->
-        
-        <calcite-icon slot="content-start" class="application-icon" icon="add-in" scale="l"></calcite-icon>
-        <h2 slot="content-start" class="application-title"></h2>
-        
-        <calcite-action-bar slot="content-end" layout="horizontal" expand-disabled="true">
-          <calcite-action id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
-          <calcite-action id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
-        </calcite-action-bar>
-        
+        <!-- ICON -->
+        <calcite-action slot="navigation-action" icon="add-in" scale="l" compact></calcite-action>
+        <!-- TITLE AND SNIPPET -->
+        <calcite-navigation-logo slot="logo" heading="Application Title" description="application description"></calcite-navigation-logo>
+        <!-- SHARE AND INFO ACTIONS -->
+        <calcite-action slot="content-end" id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
+        <calcite-action slot="content-end" id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
+        <!-- SIGN IN-->
         <div id="sign-in-container" slot="user"></div>
-        
       </calcite-navigation>
       
       <!-- LEFT -->

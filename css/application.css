@@ -47,6 +47,10 @@ html, body {
 .esri-widget,
 .esri-widget__heading,
 .esri-menu,
+.esri-input,
+.esri-bookmarks__bookmark,
+.esri-bookmarks__bookmark-name,
+.esri-layer-list__item,
 .esri-popup__main-container,
 .esri-popup__header-container--button:hover,
 .esri-popup__pointer-direction {
@@ -55,7 +59,6 @@ html, body {
 }
 
 .esri-button,
-.esri-input,
 .esri-popup__button,
 .esri-widget--button {
   color: var(--calcite-ui-icon-color) !important;
@@ -71,22 +74,28 @@ html, body {
   display: none;
 }
 
+calcite-shell[content-behind] #center-container {
+  margin: 0 50px 0 50px;
+}
 
 calcite-navigation[slot="header"] {
   --calcite-navigation-border-color: var(--calcite-ui-brand);
 }
 
-calcite-navigation[slot="header"] [slot="content-start"] {
-  align-self: center;
-}
-
 calcite-navigation[slot="header"] [slot] {
-  margin: 0 0.5rem;
+  margin: 0 0.2rem;
 }
 
-.application-title {
-  color: var(--calcite-ui-brand);
+calcite-navigation[slot="header"] calcite-action[slot="navigation-action"]:first-of-type {
+  margin-left: 1rem;
+  pointer-events: none;
 }
+
+calcite-navigation[slot="header"] calcite-navigation-logo {
+    pointer-events: none;
+  --calcite-ui-text-1: var(--calcite-ui-brand);
+}
+
 
 calcite-loader#app-loader {
   --calcite-loader-size: 8rem;
@@ -124,11 +133,6 @@ calcite-modal [slot="secondary"] calcite-label {
   display: flex;
   flex-direction: column;
 }
-
-calcite-shell[content-behind] #center-container {
-  margin: 0 50px 0 50px;
-}
-
 
 #view-container {
   padding: 0;
