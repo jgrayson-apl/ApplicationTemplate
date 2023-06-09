@@ -65,7 +65,8 @@ html, body {
   background-color: var(--calcite-ui-foreground-1) !important;
 }
 
-.esri-layer-list__item {
+.esri-layer-list__item,
+.esri-basemap-layer-list__item {
   border-color: var(--calcite-ui-border-2);
   background-color: transparent !important;
 }

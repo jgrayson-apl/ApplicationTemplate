@@ -236,7 +236,7 @@ class AppBase extends AppConfig {
     this.title = this.title?.length ? this.title : (map?.portalItem?.title || 'Application Title');
 
     // APP SNIPPET //
-    this.snippet = this.snippet?.length ? this.description : (map?.portalItem?.snippet || group?.snippet || '[missing snippet]');
+    this.snippet = this.snippet?.length ? this.snippet : (map?.portalItem?.snippet || group?.snippet || '[missing snippet]');
 
     // APP DESCRIPTION //
     this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '[missing description]');
