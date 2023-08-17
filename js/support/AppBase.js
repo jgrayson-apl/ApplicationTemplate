@@ -89,9 +89,6 @@ class AppBase extends AppConfig {
     // TOGGLE ACTION & PANELS //
     this.initializeSidePanels();
 
-    // STARTUP DIALOG //
-    this.initializeStartupDialog();
-
     // APPLICATION SHARING //
     this.initializeSharing();
 
@@ -241,6 +238,13 @@ class AppBase extends AppConfig {
     // APP DESCRIPTION //
     this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '[missing description]');
 
+    const mapAction = document.getElementById('map-action');
+    if (map.portalItem) {
+      mapAction?.setAttribute('href', map.portalItem.itemPageUrl);
+    } else {
+      mapAction?.toggleAttribute('disabled', true);
+    }
+
   }
 
   /**
@@ -283,17 +287,17 @@ class AppBase extends AppConfig {
    *     - `{${ id }}`
    *     = `{${ id.replace(/-/g,'') }}`
    *
-   * @param {boolean} dashes
-   * @param {boolean} brackets
+   * @param {boolean} [dashes]
+   * @param {boolean} [brackets]
    * @returns {string}
    * @private
    */
-  _createGUID(dashes = false, brackets = false) {
+  _createGUID({dashes = false, brackets = false}) {
     const url = URL.createObjectURL(new Blob());
     const [id] = url.toString().split('/').reverse();
     URL.revokeObjectURL(url);
     const uuid = dashes ? id : id.replace(/-/g, '');
-    return brackets ? uuid : `{${ uuid }}`;
+    return brackets ? `{${ uuid }}` : uuid;
   };
 
   /**

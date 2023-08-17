@@ -18,12 +18,12 @@
     <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.4.2/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.4.2/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.6.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.6.0/calcite.css"/>
     
     <!-- ArcGIS API for JavaScript-->
-    <link href="https://js.arcgis.com/4.26/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
-    <script src="https://js.arcgis.com/4.26/"></script>
+    <link href="https://js.arcgis.com/4.27/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
+    <script src="https://js.arcgis.com/4.27/"></script>
     
     <!-- APPLICATION -->
     <link rel="stylesheet" type="text/css" href="./css/application.css">
@@ -53,6 +53,7 @@
         </calcite-action-bar>
         
         <calcite-panel heading="Map" class="toggle-panel" data-toggle="map">
+          <calcite-button id="map-action" slot="header-actions-end" appearance="transparent" icon-end="launch" title="view map item..."></calcite-button>
           <calcite-block heading="Layers" collapsible open>
             <calcite-icon slot="icon" icon="layers"></calcite-icon>
             
@@ -65,7 +66,10 @@
             <calcite-block-section text="Base">
               <div id="basemap-base-layers-container"></div>
             </calcite-block-section>
-          
+            <calcite-block-section text="Tables">
+              <div id="tables-container"></div>
+            </calcite-block-section>
+            
           </calcite-block>
           <calcite-block heading="Legend" collapsible>
             <calcite-icon slot="icon" icon="legend"></calcite-icon>

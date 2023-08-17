@@ -58,9 +58,9 @@ html, body {
   background-color: var(--calcite-ui-foreground-1) !important;
 }
 
-.esri-button,
-.esri-popup__button,
-.esri-widget--button {
+.esri-ui .esri-button,
+.esri-ui .esri-popup__button,
+.esri-ui .esri-widget--button {
   color: var(--calcite-ui-icon-color) !important;
   background-color: var(--calcite-ui-foreground-1) !important;
 }
@@ -93,10 +93,13 @@ calcite-navigation[slot="header"] calcite-action[slot="navigation-action"]:first
 }
 
 calcite-navigation[slot="header"] calcite-navigation-logo {
-    pointer-events: none;
+  pointer-events: none;
   --calcite-ui-text-1: var(--calcite-ui-brand);
 }
 
+calcite-navigation calcite-action[slot="navigation-action"] {
+  --calcite-ui-icon-color: var(--calcite-ui-brand);
+}
 
 calcite-loader#app-loader {
   --calcite-loader-size: 8rem;
@@ -104,13 +107,16 @@ calcite-loader#app-loader {
   justify-self: center;
 }
 
-
 calcite-modal {
   --calcite-modal-content-background: var(--calcite-ui-background);
 }
 
 calcite-modal [slot="secondary"] calcite-label {
   --calcite-label-margin-bottom: 0;
+}
+
+calcite-list-item {
+  --calcite-ui-text-1: var(--calcite-ui-brand);
 }
 
 .content-row {

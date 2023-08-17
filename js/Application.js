@@ -42,6 +42,9 @@ class Application extends AppBase {
         // SET APPLICATION DETAILS //
         this.setApplicationDetails({map, group});
 
+        // STARTUP DIALOG //
+        this.initializeStartupDialog();
+
         // VIEW SHAREABLE URL PARAMETERS //
         this.initializeViewShareable({view});
 
@@ -50,6 +53,7 @@ class Application extends AppBase {
 
         // APPLICATION //
         this.applicationReady({portal, group, map, view}).catch(this.displayError).then(() => {
+
           // HIDE APP LOADER //
           document.getElementById('app-loader').toggleAttribute('hidden', true);
         });
@@ -83,10 +87,12 @@ class Application extends AppBase {
           'esri/widgets/Popup',
           'esri/widgets/Home',
           'esri/widgets/Search',
+          'esri/widgets/Legend',
           'esri/widgets/LayerList',
           'esri/widgets/BasemapLayerList',
-          'esri/widgets/Legend'
-        ], (reactiveUtils, Popup, Home, Search, LayerList, BasemapLayerList, Legend) => {
+          'esri/widgets/TableList'
+        ], (reactiveUtils, Popup, Home, Search, Legend,
+            LayerList, BasemapLayerList, TableList) => {
 
           // VIEW AND POPUP //
           view.set({
@@ -101,13 +107,14 @@ class Application extends AppBase {
             })
           });
 
-          // HOME //
-          const home = new Home({view});
-          view.ui.add(home, {position: 'top-left', index: 0});
-
           // SEARCH //
           const search = new Search({view: view});
-          view.ui.add(search, {position: 'top-right', index: 0});
+          view.ui.add(search, {position: 'top-left', index: 0});
+
+          // HOME //
+          const home = new Home({view});
+          view.ui.add(home, {position: 'top-left', index: 1});
+
 
           // BASEMAP LAYER LIST //
           const basemapReferenceLayerList = new BasemapLayerList({
@@ -143,9 +150,19 @@ class Application extends AppBase {
             }
           });
 
+          // TABLE LIST //
+          const tableList = new TableList({
+            container: 'tables-container',
+            view: view,
+            visibleElements: {
+              errors: true, statusIndicators: true
+            }
+          });
+
           // LEGEND //
           const legend = new Legend({
-            container: 'legend-container', view: view  //basemapLegendVisible: true
+            container: 'legend-container',
+            view: view  //basemapLegendVisible: true
           });
           //view.ui.add(legend, {position: 'bottom-left', index: 0});
 
