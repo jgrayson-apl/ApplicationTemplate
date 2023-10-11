@@ -239,7 +239,7 @@ class AppBase extends AppConfig {
     this.description = this.description?.length ? this.description : (map?.portalItem?.description || group?.description || '[missing description]');
 
     const mapAction = document.getElementById('map-action');
-    if (map.portalItem) {
+    if (map?.portalItem) {
       mapAction?.setAttribute('href', map.portalItem.itemPageUrl);
     } else {
       mapAction?.toggleAttribute('disabled', true);
