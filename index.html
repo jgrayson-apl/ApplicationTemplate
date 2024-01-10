@@ -18,12 +18,12 @@
     <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.min.js"></script>-->
     
     <!-- CALCITE -->
-    <script type="module" src="https://js.arcgis.com/calcite-components/1.9.0/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.9.0/calcite.css"/>
+    <script type="module" src="https://js.arcgis.com/calcite-components/2.1.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.1.0/calcite.css"/>
     
     <!-- ArcGIS API for JavaScript-->
-    <link href="https://js.arcgis.com/4.27/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
-    <script src="https://js.arcgis.com/4.27/"></script>
+    <link href="https://js.arcgis.com/4.29/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
+    <script src="https://js.arcgis.com/4.29/"></script>
     
     <!-- APPLICATION -->
     <link rel="stylesheet" type="text/css" href="./css/application.css">
@@ -34,10 +34,8 @@
       
       <!-- HEADER -->
       <calcite-navigation slot="header">
-        <!-- ICON -->
-        <calcite-action slot="navigation-action" icon="add-in" scale="l" compact></calcite-action>
         <!-- TITLE AND SNIPPET -->
-        <calcite-navigation-logo slot="logo" heading="Application Title" description="application description"></calcite-navigation-logo>
+        <calcite-navigation-logo slot="logo" icon="add-in" heading="Application Title" description="application description"></calcite-navigation-logo>
         <!-- SHARE AND INFO ACTIONS -->
         <calcite-action slot="content-end" id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
         <calcite-action slot="content-end" id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
@@ -53,7 +51,7 @@
         </calcite-action-bar>
         
         <calcite-panel heading="Map" class="toggle-panel" data-toggle="map">
-          <calcite-button id="map-action" slot="header-actions-end" appearance="transparent" icon-end="launch" title="view map item..."></calcite-button>
+          <calcite-button id="map-action" target="_blank" slot="header-actions-end" appearance="transparent" icon-end="launch" title="view map item..."></calcite-button>
           <calcite-block heading="Layers" collapsible open>
             <calcite-icon slot="icon" icon="layers"></calcite-icon>
             
@@ -69,7 +67,7 @@
             <calcite-block-section text="Tables">
               <div id="tables-container"></div>
             </calcite-block-section>
-            
+          
           </calcite-block>
           <calcite-block heading="Legend" collapsible>
             <calcite-icon slot="icon" icon="legend"></calcite-icon>
@@ -82,9 +80,9 @@
       </calcite-shell-panel>
       
       <!-- CENTER -->
-      <div id="center-container">
+      <calcite-panel id="center-container">
         <div id="view-container"></div>
-      </div>
+      </calcite-panel>
       
       <!-- RIGHT -->
       <calcite-shell-panel slot="panel-end" position="end" width-scale="m" collapsed="true">

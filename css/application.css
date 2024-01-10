@@ -14,34 +14,34 @@ html, body {
 .app-theme {
   color-scheme: light;
   --calcite-mode-name: light;
-  --calcite-ui-brand: #007AC2;
-  --calcite-ui-brand-hover: #00619B;
-  --calcite-ui-brand-press: #004974;
-  --calcite-ui-text-1: #151515;
-  --calcite-ui-text-2: #161616;
-  --calcite-ui-text-3: #191919;
-  --calcite-ui-text-highlight: #007AC2;
-  --calcite-ui-text-inverse: #ffffff;
-  --calcite-ui-text-link: #00619B;
+  --calcite-color-brand: #007AC2;
+  --calcite-color-brand-hover: #00619B;
+  --calcite-color-brand-press: #004974;
+  --calcite-color-text-1: #151515;
+  --calcite-color-text-2: #161616;
+  --calcite-color-text-3: #191919;
+  --calcite-color-text-highlight: #007AC2;
+  --calcite-color-text-inverse: #ffffff;
+  --calcite-color-text-link: #00619B;
   --calcite-link-blue-underline: rgba(0, 122, 194, 0.5);
-  --calcite-ui-background: #F7F7F7;
-  --calcite-ui-foreground-1: #FFFFFF;
-  --calcite-ui-foreground-2: #F2F2F2;
-  --calcite-ui-foreground-3: #EDEDED;
-  --calcite-ui-inverse: #000000;
-  --calcite-ui-inverse-hover: #000000;
-  --calcite-ui-inverse-press: #000000;
-  --calcite-ui-border-1: #CACACA;
-  --calcite-ui-border-2: #D4D4D4;
-  --calcite-ui-border-3: #DFDFDF;
-  --calcite-ui-border-input: #959595;
-  --calcite-ui-icon-color: currentColor;
-  --calcite-ui-info: #00619B;
-  --calcite-ui-success: #308e29;
-  --calcite-ui-warning: #f1c21b;
-  --calcite-ui-danger: #D83020;
-  --calcite-ui-danger-hover: #A82B1E;
-  --calcite-ui-danger-press: #7C1D13;
+  --calcite-color-background: #F7F7F7;
+  --calcite-color-foreground-1: #FFFFFF;
+  --calcite-color-foreground-2: #F2F2F2;
+  --calcite-color-foreground-3: #EDEDED;
+  --calcite-color-inverse: #000000;
+  --calcite-color-inverse-hover: #000000;
+  --calcite-color-inverse-press: #000000;
+  --calcite-color-border-1: #CACACA;
+  --calcite-color-border-2: #D4D4D4;
+  --calcite-color-border-3: #DFDFDF;
+  --calcite-color-border-input: #959595;
+  --calcite-color-icon-color: currentColor;
+  --calcite-color-info: #00619B;
+  --calcite-color-success: #308e29;
+  --calcite-color-warning: #f1c21b;
+  --calcite-color-danger: #D83020;
+  --calcite-color-danger-hover: #A82B1E;
+  --calcite-color-danger-press: #7C1D13;
 }
 
 .esri-widget,
@@ -54,20 +54,20 @@ html, body {
 .esri-popup__main-container,
 .esri-popup__header-container--button:hover,
 .esri-popup__pointer-direction {
-  color: var(--calcite-ui-text-2) !important;
-  background-color: var(--calcite-ui-foreground-1) !important;
+  color: var(--calcite-color-text-2) !important;
+  background-color: var(--calcite-color-foreground-1) !important;
 }
 
 .esri-ui .esri-button,
 .esri-ui .esri-popup__button,
 .esri-ui .esri-widget--button {
-  color: var(--calcite-ui-icon-color) !important;
-  background-color: var(--calcite-ui-foreground-1) !important;
+  color: var(--calcite-color-icon-color) !important;
+  background-color: var(--calcite-color-foreground-1) !important;
 }
 
 .esri-layer-list__item,
 .esri-basemap-layer-list__item {
-  border-color: var(--calcite-ui-border-2);
+  border-color: var(--calcite-color-border-2);
   background-color: transparent !important;
 }
 
@@ -80,7 +80,7 @@ calcite-shell[content-behind] #center-container {
 }
 
 calcite-navigation[slot="header"] {
-  --calcite-navigation-border-color: var(--calcite-ui-brand);
+  --calcite-navigation-border-color: var(--calcite-color-brand);
 }
 
 calcite-navigation[slot="header"] [slot] {
@@ -94,11 +94,11 @@ calcite-navigation[slot="header"] calcite-action[slot="navigation-action"]:first
 
 calcite-navigation[slot="header"] calcite-navigation-logo {
   pointer-events: none;
-  --calcite-ui-text-1: var(--calcite-ui-brand);
+  --calcite-color-text-1: var(--calcite-color-brand);
 }
 
 calcite-navigation calcite-action[slot="navigation-action"] {
-  --calcite-ui-icon-color: var(--calcite-ui-brand);
+  --calcite-color-icon-color: var(--calcite-color-brand);
 }
 
 calcite-loader#app-loader {
@@ -108,7 +108,7 @@ calcite-loader#app-loader {
 }
 
 calcite-modal {
-  --calcite-modal-content-background: var(--calcite-ui-background);
+  --calcite-modal-content-background: var(--calcite-color-background);
 }
 
 calcite-modal [slot="secondary"] calcite-label {
@@ -116,7 +116,7 @@ calcite-modal [slot="secondary"] calcite-label {
 }
 
 calcite-list-item {
-  --calcite-ui-text-1: var(--calcite-ui-brand);
+  --calcite-color-text-1: var(--calcite-color-brand);
 }
 
 .content-row {

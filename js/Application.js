@@ -87,11 +87,12 @@ class Application extends AppBase {
           'esri/widgets/Popup',
           'esri/widgets/Home',
           'esri/widgets/Search',
+          'esri/widgets/Compass',
           'esri/widgets/Legend',
           'esri/widgets/LayerList',
           'esri/widgets/BasemapLayerList',
           'esri/widgets/TableList'
-        ], (reactiveUtils, Popup, Home, Search, Legend,
+        ], (reactiveUtils, Popup, Home, Search, Compass, Legend,
             LayerList, BasemapLayerList, TableList) => {
 
           // VIEW AND POPUP //
@@ -115,6 +116,27 @@ class Application extends AppBase {
           const home = new Home({view});
           view.ui.add(home, {position: 'top-left', index: 1});
 
+          // COMPASS //
+          const compass = new Compass({view: view});
+          view.ui.add(compass, {position: 'top-left', index: 2});
+          reactiveUtils.watch(() => view.rotation, rotation => {
+            compass.set({visible: (rotation > 0)});
+          }, {initial: true});
+
+          // MAP SCALE //
+          const scaleFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+          const scaleLabel = document.createElement('calcite-chip');
+          scaleLabel.setAttribute('scale', 's');
+          scaleLabel.setAttribute('icon', 'switch');
+          scaleLabel.setAttribute('title', 'map scale');
+          view.ui.add(scaleLabel, {position: 'bottom-left', index: 0});
+          reactiveUtils.watch(() => view.scale, scale => {
+            scaleLabel.innerHTML = `1: ${ scaleFormatter.format(scale) }`;
+          }, {initial: true});
+
+          // VIEW LOADING INDICATOR //
+          const viewLoading = new ViewLoading({view: view});
+          view.ui.add(viewLoading, 'bottom-right');
 
           // BASEMAP LAYER LIST //
           const basemapReferenceLayerList = new BasemapLayerList({
@@ -153,7 +175,7 @@ class Application extends AppBase {
           // TABLE LIST //
           const tableList = new TableList({
             container: 'tables-container',
-            view: view,
+            map: view.map,
             visibleElements: {
               errors: true, statusIndicators: true
             }
@@ -165,10 +187,6 @@ class Application extends AppBase {
             view: view  //basemapLegendVisible: true
           });
           //view.ui.add(legend, {position: 'bottom-left', index: 0});
-
-          // VIEW LOADING INDICATOR //
-          const viewLoading = new ViewLoading({view: view});
-          view.ui.add(viewLoading, 'bottom-right');
 
           resolve();
         });
