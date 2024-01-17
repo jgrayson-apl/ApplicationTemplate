@@ -139,7 +139,7 @@ class Application extends AppBase {
           view.ui.add(viewLoading, 'bottom-right');
 
           // BASEMAP LAYER LIST //
-          const basemapReferenceLayerList = new BasemapLayerList({
+          /*const basemapReferenceLayerList = new BasemapLayerList({
             container: 'basemap-reference-layers-container',
             view: view,
             visibleElements: {
@@ -148,7 +148,7 @@ class Application extends AppBase {
               errors: true,
               statusIndicators: true
             }
-          });
+          });*/
 
           // LAYER LIST //
           const layerList = new LayerList({
@@ -161,7 +161,7 @@ class Application extends AppBase {
           });
 
           // BASEMAP LAYER LIST //
-          const basemapBaseLayerList = new BasemapLayerList({
+          /*const basemapBaseLayerList = new BasemapLayerList({
             container: 'basemap-base-layers-container',
             view: view,
             visibleElements: {
@@ -170,16 +170,16 @@ class Application extends AppBase {
               errors: true,
               statusIndicators: true
             }
-          });
+          });*/
 
           // TABLE LIST //
-          const tableList = new TableList({
+          /*const tableList = new TableList({
             container: 'tables-container',
             map: view.map,
             visibleElements: {
               errors: true, statusIndicators: true
             }
-          });
+          });*/
 
           // LEGEND //
           const legend = new Legend({
