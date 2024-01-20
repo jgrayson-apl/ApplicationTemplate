@@ -89,11 +89,8 @@ class Application extends AppBase {
           'esri/widgets/Search',
           'esri/widgets/Compass',
           'esri/widgets/Legend',
-          'esri/widgets/LayerList',
-          'esri/widgets/BasemapLayerList',
-          'esri/widgets/TableList'
-        ], (reactiveUtils, Popup, Home, Search, Compass, Legend,
-            LayerList, BasemapLayerList, TableList) => {
+          'esri/widgets/LayerList'
+        ], (reactiveUtils, Popup, Home, Search, Compass, Legend, LayerList) => {
 
           // VIEW AND POPUP //
           view.set({
@@ -138,18 +135,6 @@ class Application extends AppBase {
           const viewLoading = new ViewLoading({view: view});
           view.ui.add(viewLoading, 'bottom-right');
 
-          // BASEMAP LAYER LIST //
-          /*const basemapReferenceLayerList = new BasemapLayerList({
-            container: 'basemap-reference-layers-container',
-            view: view,
-            visibleElements: {
-              referenceLayers: true,
-              baseLayers: false,
-              errors: true,
-              statusIndicators: true
-            }
-          });*/
-
           // LAYER LIST //
           const layerList = new LayerList({
             container: 'layers-container',
@@ -159,27 +144,6 @@ class Application extends AppBase {
               statusIndicators: true
             }
           });
-
-          // BASEMAP LAYER LIST //
-          /*const basemapBaseLayerList = new BasemapLayerList({
-            container: 'basemap-base-layers-container',
-            view: view,
-            visibleElements: {
-              referenceLayers: false,
-              baseLayers: true,
-              errors: true,
-              statusIndicators: true
-            }
-          });*/
-
-          // TABLE LIST //
-          /*const tableList = new TableList({
-            container: 'tables-container',
-            map: view.map,
-            visibleElements: {
-              errors: true, statusIndicators: true
-            }
-          });*/
 
           // LEGEND //
           const legend = new Legend({

@@ -48,7 +48,7 @@ class ViewLoading extends HTMLElement {
   }
 
   set enabled(value) {
-    this.#enabled = value;
+    this.#enabled = value && this.view.updating;
     this.loader?.toggleAttribute('hidden', !this.#enabled);
   }
 
