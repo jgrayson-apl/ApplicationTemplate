@@ -257,8 +257,8 @@ class FeaturesList extends HTMLElement {
       this._createFeaturesList();
 
       // VIEW SELECTION CHANGE //
-      reactiveUtils.watch(() => this.view.popup.selectedFeature, selectedFeature => {
-        if (selectedFeature?.layer.id === this.featureLayer.id) {
+      reactiveUtils.watch(() => [this.view.popup.visisble, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
+        if (visible && (selectedFeature?.layer?.id === this.featureLayer.id)) {
           const featureOID = selectedFeature.getObjectId();
           this.updateSelection({featureOID});
         } else {

@@ -19,6 +19,7 @@ import AppLoader from "./loaders/AppLoader.js";
 import SignIn from './apl/SignIn.js';
 import FeaturesList from './apl/FeaturesList.js';
 import ViewLoading from './apl/ViewLoading.js';
+import MapScale from './apl/MapScale.js';
 
 class Application extends AppBase {
 
@@ -121,19 +122,12 @@ class Application extends AppBase {
           }, {initial: true});
 
           // MAP SCALE //
-          const scaleFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-          const scaleLabel = document.createElement('calcite-chip');
-          scaleLabel.setAttribute('scale', 's');
-          scaleLabel.setAttribute('icon', 'switch');
-          scaleLabel.setAttribute('title', 'map scale');
-          view.ui.add(scaleLabel, {position: 'bottom-left', index: 0});
-          reactiveUtils.watch(() => view.scale, scale => {
-            scaleLabel.innerHTML = `1: ${ scaleFormatter.format(scale) }`;
-          }, {initial: true});
+          const mapScale = new MapScale({view})
+          view.ui.add(mapScale, {position: 'bottom-left', index: 0});
 
           // VIEW LOADING INDICATOR //
           const viewLoading = new ViewLoading({view: view});
-          view.ui.add(viewLoading, 'bottom-right');
+          view.ui.add(viewLoading, 'bottom-left');
 
           // LAYER LIST //
           const layerList = new LayerList({
