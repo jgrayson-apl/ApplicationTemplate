@@ -40,37 +40,10 @@ class FeaturesList extends HTMLElement {
     FeaturesList.FEATURE_ITEM_TEMPLATE = document.createElement('template');
     FeaturesList.FEATURE_ITEM_TEMPLATE.innerHTML = `      
       <calcite-list-item value="" label="" description="">        
-        <calcite-action slot="actions-end" scale="s" icon="blank"></calcite-action>        
+        <calcite-action slot="actions-end" scale="s" icon="information"></calcite-action>        
       </calcite-list-item>
     `;
   }
-
-  /**
-   *
-   * @enum {string}
-   */
-  static ACTIVITY = {
-    'NONE': 'NONE',
-    'GOTO': 'GOTO',
-    'DETAILS': 'DETAILS',
-    'EVENT': 'EVENT'
-  };
-
-  /**
-   *
-   * @enum {string}
-   */
-  static ACTIVITY_ICON = {
-    'NONE': 'blank',
-    'GOTO': 'zoom-to-object',
-    'DETAILS': 'popup',
-    'EVENT': 'route-from'
-  };
-
-  /**
-   * @type {string}
-   */
-  id;
 
   /**
    * @type {HTMLElement}
@@ -115,57 +88,35 @@ class FeaturesList extends HTMLElement {
   getFeatureInfo;
 
   /**
-   * @type {FeaturesList.ACTIVITY}
-   */
-  selectActivity;
-
-  /**
-   * @type {AbortController}
-   */
-  activityAbortController;
-
-  /**
-   * @type {FeaturesList.ACTIVITY}
-   */
-  actionActivity;
-
-  /**
-   * @type {boolean}
-   */
-  filterEnabled;
-
-  /**
    *
    * @param {HTMLElement|string} container
    * @param {MapView|SceneView} view
-   * @param {boolean} [filterEnabled]
-   * @param {FeaturesList.ACTIVITY} [selectActivity]
-   * @param {FeaturesList.ACTIVITY} [actionActivity]
+   * @param {FeatureLayer} featureLayer
+   * @param {Object} queryParams
+   * @param {FeatureInfoCallback} getFeatureInfoCallback
    */
   constructor({
                 container,
                 view,
-                filterEnabled = true,
-                selectActivity = FeaturesList.ACTIVITY.NONE,
-                actionActivity = FeaturesList.ACTIVITY.NONE
+                featureLayer,
+                queryParams,
+                getFeatureInfoCallback
               }) {
     super();
 
     this.container = (container instanceof HTMLElement) ? container : document.getElementById(container);
     this.view = view;
-
-    this.filterEnabled = filterEnabled;
-    this.selectActivity = selectActivity;
-    this.actionActivity = actionActivity;
-
-    this.featuresByOID = new Map();
-    this.geometryByOID = new Map();
-
+    this.featureLayer = featureLayer;
     this.#queryParams = {
       where: '1=1',
       maxRecordCountFactor: 5,
-      returnGeometry: false
+      returnGeometry: false,
+      ...queryParams
     };
+    this.getFeatureInfo = getFeatureInfoCallback;
+
+    this.featuresByOID = new Map();
+    this.geometryByOID = new Map();
 
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
@@ -187,7 +138,7 @@ class FeaturesList extends HTMLElement {
         <calcite-flow-item>          
           <calcite-panel class="list-container" >
             <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>
-            <calcite-list ${ this.filterEnabled ? "filter-enabled" : null } selection-mode="single" selection-appearance="icon"></calcite-list>                          
+            <calcite-list filter-enabled selection-mode="single" selection-appearance="icon"></calcite-list>                          
             <calcite-pagination slot="footer" page-size="1" start-item="1" total-items="100" scale="s"></calcite-pagination>
           </calcite-panel>      
         </calcite-flow-item>          
@@ -207,6 +158,8 @@ class FeaturesList extends HTMLElement {
     this.flowPanel = this.shadowRoot.querySelector('calcite-flow');
     // PANEL //
     this.listPanel = this.shadowRoot.querySelector('.list-container');
+    // PANEL HEADING //
+    this.listPanel.setAttribute('heading', this.featureLayer.title);
 
     // CLEAR LIST ACTION //
     this.clearListAction = this.shadowRoot.querySelector('.clear-selection-action');
@@ -216,61 +169,25 @@ class FeaturesList extends HTMLElement {
 
     // LIST //
     this.list = this.shadowRoot.querySelector('calcite-list');
+    // FILTER PLACEHOLDER //
+    this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }' features...`);
 
-    // SELECTION ACTIVITY //
-    if (this.selectActivity !== FeaturesList.ACTIVITY.NONE) {
-      // LIST SELECTION CHANGE //
-      this.list.addEventListener('calciteListItemSelect', () => {
-        requestAnimationFrame(() => {
-          const selectedItems = this.list.querySelectorAll("[selected]");
-          if (selectedItems?.length) {
-            const selectedItem = selectedItems[0];
-            this._doActivity({activity: this.selectActivity, oid: Number(selectedItem.value), eventName: 'item-selected'});
-          } else {
-            this.clearSelection();
-          }
+    // LIST SELECTION CHANGE //
+    this.list.addEventListener('calciteListItemSelect', () => {
+
+      const [selectedItem] = this.list.selectedItems;
+      if (selectedItem) {
+        const action = selectedItem.querySelector('calcite-action');
+        action.toggleAttribute('loading', true);
+        this._goToFeature({selectedItem}).then(() => {
+          action.toggleAttribute('loading', false);
         });
-      });
-    }
-
-  }
-
-  /**
-   *
-   * @param {FeatureLayer} featureLayer
-   * @param {Object}queryParams
-   * @param {FeatureInfoCallback} getFeatureInfoCallback
-   */
-  initialize({featureLayer, queryParams = {}, getFeatureInfoCallback}) {
-    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
-
-      this.id = `feature-list-${ featureLayer.title.replace(/ /g, '_') }`;
-
-      this.featureLayer = featureLayer;
-      this.#queryParams = {...this.#queryParams, ...queryParams};
-      this.getFeatureInfo = getFeatureInfoCallback;
-
-      // PANEL HEADING //
-      this.listPanel.setAttribute('heading', this.featureLayer.title);
-
-      // FILTER PLACEHOLDER //
-      this.filterEnabled && this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }' features...`);
-
-      // CREATE FEATURES LIST //
-      this._createFeaturesList();
-
-      /*
-       reactiveUtils.watch(() => [this.view.popup.visible, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
-       if (visible && (selectedFeature?.layer?.id === this.featureLayer.id)) {
-       const featureOID = selectedFeature.getObjectId();
-       this.updateSelection({featureOID});
-       } else {
-       this.clearSelection();
-       }
-       });
-       */
-
+      }
     });
+
+    // CREATE FEATURES LIST //
+    this._createFeaturesList();
+
   }
 
   /**
@@ -307,42 +224,6 @@ class FeaturesList extends HTMLElement {
 
     }).catch(console.error);
 
-  }
-
-  /**
-   *
-   * @param {FeaturesList.ACTIVITY} activity
-   * @param {number} oid
-   * @param {string} eventName
-   * @private
-   */
-  _doActivity({activity, oid, eventName}) {
-
-    this.activityAbortController?.abort();
-    this.activityAbortController = new AbortController();
-
-    // GEOMETRY //
-    this._getFeatureGeometry({featureOID: oid, signal: this.activityAbortController.signal}).then(({geometry}) => {
-      // FEATURE //
-      const feature = this.featuresByOID.get(oid);
-      // ACTIVITY //
-      switch (activity) {
-        case FeaturesList.ACTIVITY.GOTO:
-          this._goToFeatureByOID(oid).then(() => {
-            //if (this.view.popup.selectedFeature?.getObjectId() !== oid) { this.view.popup.close(); }
-            this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
-          });
-          break;
-        case FeaturesList.ACTIVITY.DETAILS:
-          //this.view.popup.open({features: [feature]});
-          this._updateDetails(feature);
-          this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
-          break;
-        case FeaturesList.ACTIVITY.EVENT:
-          this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
-          break;
-      }
-    }).catch(error => { if (error.name !== 'AbortError') { console.error(error);}});
   }
 
   /**
@@ -384,23 +265,16 @@ class FeaturesList extends HTMLElement {
     const templateContent = FeaturesList.FEATURE_ITEM_TEMPLATE.content.cloneNode(true);
     const featureListItem = templateContent.querySelector('calcite-list-item');
 
-    const {label, description, value} = this.getFeatureInfo(feature);
+    const {value, label, description} = this.getFeatureInfo(feature);
 
+    featureListItem.setAttribute('value', value);
     featureListItem.setAttribute('label', label);
     featureListItem.setAttribute('description', description);
-    featureListItem.setAttribute('value', value);
 
     const action = featureListItem.querySelector('calcite-action');
-    if (this.actionActivity === FeaturesList.ACTIVITY.NONE) {
-      action.toggleAttribute('hidden', true);
-
-    } else {
-      action.setAttribute('icon', FeaturesList.ACTIVITY_ICON[this.actionActivity]);
-      action.addEventListener('click', () => {
-        const actionOID = Number(action.parentNode.value);
-        this._doActivity({activity: this.actionActivity, oid: actionOID, eventName: 'item-action'});
-      });
-    }
+    action.addEventListener('click', () => {
+      this._updateDetails(feature);
+    });
 
     return featureListItem;
   }
@@ -408,62 +282,53 @@ class FeaturesList extends HTMLElement {
   /**
    *
    * @param {number} featureOID
-   * @param {AbortSignal} [signal]
    * @returns {Promise<Graphic>}
    * @private
    */
-  _getFeatureGeometry({featureOID, signal}) {
+  _getFeatureGeometry({featureOID}) {
     return new Promise((resolve, reject) => {
-      require(['esri/core/promiseUtils'], (promiseUtils) => {
 
-        let geometry = this.geometryByOID.get(featureOID);
-        if (geometry) {
-          resolve({geometry});
-        } else {
-          this.featureLayer.queryFeatures({
-            returnGeometry: true,
-            outFields: [],
-            objectIds: [Number(featureOID)]
-          }, {signal}).then(fs => {
-            if (signal.aborted) { reject(promiseUtils.createAbortError()); } else {
-              if (fs.features.length) {
-                geometry = fs.features[0].geometry;
-                this.geometryByOID.set(featureOID, geometry);
-                resolve({geometry});
-              } else { reject(new Error("Can't get feature geometry.")); }
-            }
-          }).catch((error) => {
-            if (!promiseUtils.isAbortError(error)) { reject(error); }
-          });
-        }
+      let geometry = this.geometryByOID.get(featureOID);
+      if (geometry) {
+        resolve({geometry});
 
-      });
+      } else {
+        this.featureLayer.queryFeatures({
+          returnGeometry: true,
+          outFields: [],
+          objectIds: [Number(featureOID)]
+        }).then(fs => {
+          if (fs.features.length) {
+            geometry = fs.features[0].geometry;
+            this.geometryByOID.set(featureOID, geometry);
+            resolve({geometry});
+          } else {
+            reject(new Error("Can't get feature geometry."));
+          }
+        }).catch(reject);
+      }
+
     });
   }
 
   /**
    *
-   * @param {number} featureOID
+   * @param {CalciteListItem} selectedItem
    * @private
    */
-  _goToFeatureByOID(featureOID) {
+  _goToFeature({selectedItem}) {
     return new Promise((resolve, reject) => {
-      require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-        const selectedItem = this.list.querySelector(`calcite-list-item[value="${ featureOID }"]`);
-        const action = selectedItem.querySelector('calcite-action');
-        action.toggleAttribute('loading', true);
+      const featureOID = Number(selectedItem.value);
 
-        this._getFeatureGeometry({featureOID}).then(({geometry}) => {
-          const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
-          const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
-          this.view.goTo({target: goToTarget, ...goToOptions}).then(() => {
-            resolve({geometry});
-          }).catch(reject).finally(() => {
-            action.toggleAttribute('loading', false);
-          });
-        }).catch(reject);
-      });
+      this._getFeatureGeometry({featureOID}).then(({geometry}) => {
+        const goToTarget = (geometry.type === 'point') ? geometry : geometry.extent.clone().expand(1.5);
+        const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
+        this.view.goTo({target: goToTarget, ...goToOptions}).then(() => {
+          resolve({geometry});
+        });
+      }).catch(reject);
+
     });
   }
 
@@ -471,7 +336,6 @@ class FeaturesList extends HTMLElement {
    *
    */
   clearSelection() {
-    //this.view.popup.close();
     this.list.selectedItems.forEach(selectedItem => selectedItem.selected = false);
   }
 
@@ -479,17 +343,17 @@ class FeaturesList extends HTMLElement {
    *
    * @param {number} featureOID
    */
-  updateSelection({featureOID}) {
-    if (featureOID) {
-      const featureListItem = this.list.querySelector(`calcite-list-item[value="${ featureOID }"]`);
-      if (featureListItem) {
-        featureListItem.scrollIntoView({block: 'center', behavior: 'smooth'});
-        featureListItem.selected = true;
-      }
-    } else {
-      this.clearSelection();
-    }
-  }
+  /*updateSelection({featureOID}) {
+   if (featureOID) {
+   const featureListItem = this.list.querySelector(`calcite-list-item[value="${ featureOID }"]`);
+   if (featureListItem) {
+   featureListItem.scrollIntoView({block: 'center', behavior: 'smooth'});
+   featureListItem.selected = true;
+   }
+   } else {
+   this.clearSelection();
+   }
+   }*/
 
 }
 

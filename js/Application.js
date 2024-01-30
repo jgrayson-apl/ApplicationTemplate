@@ -122,7 +122,7 @@ class Application extends AppBase {
           }, {initial: true});
 
           // MAP SCALE //
-          const mapScale = new MapScale({view})
+          const mapScale = new MapScale({view});
           view.ui.add(mapScale, {position: 'bottom-left', index: 0});
 
           // VIEW LOADING INDICATOR //
@@ -199,17 +199,10 @@ class Application extends AppBase {
            * @returns {{description: string, label: string, value: string}}
            */
 
-            // FEATURES LIST CONTAINER
-          const featureListContainer = document.getElementById('feature-list-container');
-
           // FEATURES LIST //
           const featuresList = new FeaturesList({
             view,
-            container: featureListContainer,
-            selectActivity: FeaturesList.ACTIVITY.GOTO,
-            actionActivity: FeaturesList.ACTIVITY.DETAILS
-          });
-          featuresList.initialize({
+            container: 'feature-list-container',
             featureLayer,
             queryParams: {
               where: '(IncidentName is not null)',
@@ -217,13 +210,11 @@ class Application extends AppBase {
               orderByFields: ['DateCurrent DESC']
             },
             getFeatureInfoCallback: (feature) => {
-              // return {description: string, label: string, value: string} //
-              const value = String(feature.getObjectId());
-
-              const label = `${ feature.attributes.IncidentName }`;
-              const description = `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`;
-
-              return {label, description, value};
+              return {
+                value: String(feature.getObjectId()),
+                label: `${ feature.attributes.IncidentName }`,
+                description: `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`
+              };
             }
           });
 
