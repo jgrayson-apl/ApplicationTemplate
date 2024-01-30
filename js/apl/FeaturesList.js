@@ -151,7 +151,13 @@ class FeaturesList extends HTMLElement {
    * @param {FeaturesList.ACTIVITY} [selectActivity]
    * @param {FeaturesList.ACTIVITY} [actionActivity]
    */
-  constructor({container, view, filterEnabled = true, selectActivity = FeaturesList.ACTIVITY.NONE, actionActivity = FeaturesList.ACTIVITY.NONE}) {
+  constructor({
+                container,
+                view,
+                filterEnabled = true,
+                selectActivity = FeaturesList.ACTIVITY.NONE,
+                actionActivity = FeaturesList.ACTIVITY.NONE
+              }) {
     super();
 
     this.container = (container instanceof HTMLElement) ? container : document.getElementById(container);
@@ -184,14 +190,15 @@ class FeaturesList extends HTMLElement {
           max-height: calc(100vh - 120px);         
           overflow: auto;
         }       
-      </style>
-      <calcite-panel heading="Features List">
-        <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>      
-        <calcite-list filter-enabled="${ String(this.filterEnabled) }" selection-mode="single" selection-appearance="icon"</calcite-list>        
-      </calcite-panel>           
+      </style>      
+      <calcite-flow>        
+        <calcite-flow-item class="list-container" heading="Features List">
+          <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>      
+          <calcite-list ${ this.filterEnabled ? "filter-enabled" : null } selection-mode="single" selection-appearance="icon"</calcite-list>
+          <calcite-pagination slot="footer" num="100"></calcite-pagination>              
+        </calcite-flow-item>
+      </calcite-flow>
     `;
-
-    //<calcite-pagination slot="footer" num="100"></calcite-pagination>
 
     this.container?.append(this);
 
@@ -202,8 +209,10 @@ class FeaturesList extends HTMLElement {
    */
   connectedCallback() {
 
+    // FLOW //
+    this.flowPanel = this.shadowRoot.querySelector('calcite-flow');
     // PANEL //
-    this.panel = this.shadowRoot.querySelector('calcite-panel');
+    this.listPanel = this.shadowRoot.querySelector('calcite-flow-item.list-container');
 
     // CLEAR LIST ACTION //
     this.clearListAction = this.shadowRoot.querySelector('.clear-selection-action');
@@ -248,7 +257,7 @@ class FeaturesList extends HTMLElement {
       this.getFeatureInfo = getFeatureInfoCallback;
 
       // PANEL HEADING //
-      this.panel.setAttribute('heading', this.featureLayer.title);
+      this.listPanel.setAttribute('heading', this.featureLayer.title);
 
       // FILTER PLACEHOLDER //
       this.filterEnabled && this.list.setAttribute('filter-placeholder', `filter '${ this.featureLayer.title }' features...`);
@@ -256,15 +265,16 @@ class FeaturesList extends HTMLElement {
       // CREATE FEATURES LIST //
       this._createFeaturesList();
 
-      // VIEW SELECTION CHANGE //
-      reactiveUtils.watch(() => [this.view.popup.visisble, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
-        if (visible && (selectedFeature?.layer?.id === this.featureLayer.id)) {
-          const featureOID = selectedFeature.getObjectId();
-          this.updateSelection({featureOID});
-        } else {
-          this.clearSelection();
-        }
-      });
+      /*
+       reactiveUtils.watch(() => [this.view.popup.visisble, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
+       if (visible && (selectedFeature?.layer?.id === this.featureLayer.id)) {
+       const featureOID = selectedFeature.getObjectId();
+       this.updateSelection({featureOID});
+       } else {
+       this.clearSelection();
+       }
+       });
+       */
 
     });
   }
@@ -325,14 +335,13 @@ class FeaturesList extends HTMLElement {
       switch (activity) {
         case FeaturesList.ACTIVITY.GOTO:
           this._goToFeatureByOID(oid).then(() => {
-            if (this.view.popup.selectedFeature?.getObjectId() !== oid) {
-              this.view.popup.close();
-            }
+            //if (this.view.popup.selectedFeature?.getObjectId() !== oid) { this.view.popup.close(); }
             this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
           });
           break;
         case FeaturesList.ACTIVITY.POPUP:
-          this.view.popup.open({features: [feature]});
+          //this.view.popup.open({features: [feature]});
+          this._updateDetails(feature);
           this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
           break;
         case FeaturesList.ACTIVITY.EVENT:
@@ -340,6 +349,30 @@ class FeaturesList extends HTMLElement {
           break;
       }
     }).catch(error => { if (error.name !== 'AbortError') { console.error(error);}});
+  }
+
+  _updateDetails(detailsFeature) {
+    require([
+      'esri/core/reactiveUtils',
+      'esri/widgets/Feature'
+    ], (reactiveUtils, Feature) => {
+
+      const featureUI = new Feature({
+        container: document.createElement("div"),
+        view: this.view,
+        graphic: detailsFeature
+      });
+
+      const featureUICard = document.createElement("calcite-card");
+      featureUICard.style.setProperty('margin', '5px');
+      featureUICard.append(featureUI.container);
+
+      const detailsFlowItem = document.createElement("calcite-flow-item");
+      detailsFlowItem.setAttribute('heading', 'Details');
+      detailsFlowItem.append(featureUICard);
+
+      this.flowPanel.append(detailsFlowItem);
+    });
   }
 
   /**
@@ -393,15 +426,15 @@ class FeaturesList extends HTMLElement {
             outFields: [],
             objectIds: [Number(featureOID)]
           }, {signal}).then(fs => {
-            if (signal.aborted) {
-              reject(promiseUtils.createAbortError());
-            } else {
+            if (signal.aborted) { reject(promiseUtils.createAbortError()); } else {
               if (fs.features.length) {
                 geometry = fs.features[0].geometry;
                 this.geometryByOID.set(featureOID, geometry);
                 resolve({geometry});
               } else { reject(new Error("Can't get feature geometry.")); }
             }
+          }).catch((error) => {
+            if (!promiseUtils.isAbortError(error)) { reject(error); }
           });
         }
 
@@ -427,7 +460,7 @@ class FeaturesList extends HTMLElement {
           const goToOptions = (geometry.type === 'point') ? {scale: 500000} : {};
           this.view.goTo({target: goToTarget, ...goToOptions}).then(() => {
             resolve({geometry});
-          }).catch(reject).then(() => {
+          }).catch(reject).finally(() => {
             action.toggleAttribute('loading', false);
           });
         }).catch(reject);
@@ -439,7 +472,7 @@ class FeaturesList extends HTMLElement {
    *
    */
   clearSelection() {
-    this.view.popup.close();
+    //this.view.popup.close();
     this.list.selectedItems.forEach(selectedItem => selectedItem.selected = false);
   }
 
