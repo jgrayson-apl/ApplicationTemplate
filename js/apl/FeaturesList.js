@@ -39,17 +39,8 @@ class FeaturesList extends HTMLElement {
   static {
     FeaturesList.FEATURE_ITEM_TEMPLATE = document.createElement('template');
     FeaturesList.FEATURE_ITEM_TEMPLATE.innerHTML = `      
-      <calcite-list-item
-        label=""
-        description=""
-        value="">        
-        <calcite-action
-          slot="actions-end"
-          label=""
-          scale="s"
-          appearance="transparent"
-          icon="blank">
-        </calcite-action>
+      <calcite-list-item value="" label="" description="">        
+        <calcite-action slot="actions-end" scale="s" icon="blank"></calcite-action>        
       </calcite-list-item>
     `;
   }
@@ -61,7 +52,7 @@ class FeaturesList extends HTMLElement {
   static ACTIVITY = {
     'NONE': 'NONE',
     'GOTO': 'GOTO',
-    'POPUP': 'POPUP',
+    'DETAILS': 'DETAILS',
     'EVENT': 'EVENT'
   };
 
@@ -72,7 +63,7 @@ class FeaturesList extends HTMLElement {
   static ACTIVITY_ICON = {
     'NONE': 'blank',
     'GOTO': 'zoom-to-object',
-    'POPUP': 'popup',
+    'DETAILS': 'popup',
     'EVENT': 'route-from'
   };
 
@@ -180,23 +171,26 @@ class FeaturesList extends HTMLElement {
     shadowRoot.innerHTML = `
       <style>
         :host {          
-          display: flex;            
-          flex-shrink: 1;
-          flex-grow: 1;
+          display: flex;
           flex-direction: column;
-          justify-content: flex-start;            
-          min-width: 0;
-          min-height: 0;                     
-          max-height: calc(100vh - 120px);         
-          overflow: auto;
-        }       
-      </style>      
+          flex: 1 1 auto;
+          /*overflow: auto;*/          
+        }
+        :host calcite-panel [slot="footer"]{
+          justify-content: space-around;
+        }
+        :host calcite-pagination {
+          width: 100%;
+        }               
+      </style>            
       <calcite-flow>        
-        <calcite-flow-item class="list-container" heading="Features List">
-          <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>      
-          <calcite-list ${ this.filterEnabled ? "filter-enabled" : null } selection-mode="single" selection-appearance="icon"</calcite-list>
-          <calcite-pagination slot="footer" num="100"></calcite-pagination>              
-        </calcite-flow-item>
+        <calcite-flow-item>          
+          <calcite-panel class="list-container" >
+            <calcite-action slot="header-actions-end" class="clear-selection-action" icon="selection-x" title="clear selection"></calcite-action>
+            <calcite-list ${ this.filterEnabled ? "filter-enabled" : null } selection-mode="single" selection-appearance="icon"></calcite-list>                          
+            <calcite-pagination slot="footer" page-size="1" start-item="1" total-items="100" scale="s"></calcite-pagination>
+          </calcite-panel>      
+        </calcite-flow-item>          
       </calcite-flow>
     `;
 
@@ -212,7 +206,7 @@ class FeaturesList extends HTMLElement {
     // FLOW //
     this.flowPanel = this.shadowRoot.querySelector('calcite-flow');
     // PANEL //
-    this.listPanel = this.shadowRoot.querySelector('calcite-flow-item.list-container');
+    this.listPanel = this.shadowRoot.querySelector('.list-container');
 
     // CLEAR LIST ACTION //
     this.clearListAction = this.shadowRoot.querySelector('.clear-selection-action');
@@ -266,7 +260,7 @@ class FeaturesList extends HTMLElement {
       this._createFeaturesList();
 
       /*
-       reactiveUtils.watch(() => [this.view.popup.visisble, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
+       reactiveUtils.watch(() => [this.view.popup.visible, this.view.popup.selectedFeature], ([visible, selectedFeature]) => {
        if (visible && (selectedFeature?.layer?.id === this.featureLayer.id)) {
        const featureOID = selectedFeature.getObjectId();
        this.updateSelection({featureOID});
@@ -339,7 +333,7 @@ class FeaturesList extends HTMLElement {
             this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
           });
           break;
-        case FeaturesList.ACTIVITY.POPUP:
+        case FeaturesList.ACTIVITY.DETAILS:
           //this.view.popup.open({features: [feature]});
           this._updateDetails(feature);
           this.dispatchEvent(new CustomEvent(eventName, {detail: {activity, feature, geometry}}));
@@ -351,6 +345,11 @@ class FeaturesList extends HTMLElement {
     }).catch(error => { if (error.name !== 'AbortError') { console.error(error);}});
   }
 
+  /**
+   *
+   * @param {Graphic} detailsFeature
+   * @private
+   */
   _updateDetails(detailsFeature) {
     require([
       'esri/core/reactiveUtils',

@@ -207,7 +207,7 @@ class Application extends AppBase {
             view,
             container: featureListContainer,
             selectActivity: FeaturesList.ACTIVITY.GOTO,
-            actionActivity: FeaturesList.ACTIVITY.POPUP
+            actionActivity: FeaturesList.ACTIVITY.DETAILS
           });
           featuresList.initialize({
             featureLayer,
