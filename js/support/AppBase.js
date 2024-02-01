@@ -309,6 +309,24 @@ class AppBase extends AppConfig {
    * @param {string} val
    */
   setShadowElementStyle(ref, selector, rule, val) {
+    if (ref.componentOnReady) {
+      ref.componentOnReady().then(() => {
+        this._setShadowElementStyle(ref, selector, rule, val);
+      });
+    } else {
+      this._setShadowElementStyle(ref, selector, rule, val);
+    }
+  }
+
+  /**
+   * Example: setShadowElementStyle(diseaseInput, ".list-container", "maxHeight", "200px");
+   *
+   * @param {HTMLElement} ref
+   * @param {string} selector
+   * @param {string} rule
+   * @param {string} val
+   */
+  _setShadowElementStyle(ref, selector, rule, val) {
     const shadowDiv = ref.shadowRoot.querySelector(`${ selector }`);
     if (shadowDiv && shadowDiv.style[rule] !== val) shadowDiv.style[rule] = val;
   }
