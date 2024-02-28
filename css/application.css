@@ -1,47 +1,49 @@
 html, body {
   padding: 0;
   margin: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   overflow: hidden;
+  background-color: var(--calcite-color-background);
 }
 
 /* Calcite Theme Editor: https://esrips.github.io/calcite-theme-editor/ */
 
-
 .calcite-mode-dark {
   color-scheme: dark;
   --calcite-mode-name: dark;
-  --calcite-color-brand: #D99F41;
-  --calcite-color-brand-hover: #B07A23;
-  --calcite-color-brand-press: #93661D;
-  --calcite-color-text-1: #FCCCCC;
-  --calcite-color-text-2: #ffefef;
+  --calcite-color-brand: #009AF2;
+  --calcite-color-brand-hover: #0074B5;
+  --calcite-color-brand-press: #006097;
+  --calcite-color-text-1: #FFFFFF;
+  --calcite-color-text-2: #FFFFFF;
   --calcite-color-text-3: #FFFFFF;
-  --calcite-ui-text-highlight: #D99F41;
+  --calcite-ui-text-highlight: #009AF2;
   --calcite-color-text-inverse: #000000;
-  --calcite-color-text-link: #B07A23;
-  --calcite-link-blue-underline: rgba(217, 159, 65, 0.5);
-  --calcite-color-background: #946262;
-  --calcite-color-foreground-1: #785050;
-  --calcite-color-foreground-2: #5A3C3C;
-  --calcite-color-foreground-3: #362424;
-  --calcite-color-inverse: #87AFAF;
-  --calcite-color-inverse-hover: #639595;
-  --calcite-color-inverse-press: #4A7070;
-  --calcite-color-border-1: #624040;
-  --calcite-color-border-2: #5A3A3A;
-  --calcite-color-border-3: #523535;
-  --calcite-color-border-input: #6B4545;
-  --calcite-color-icon-color: currentColor;
-  --calcite-color-status-info: #B07A23;
+  --calcite-color-text-link: #0074B5;
+  --calcite-link-blue-underline: rgba(0, 154, 242, 0.5);
+  --calcite-color-background: #353535;
+  --calcite-color-foreground-1: #2B2B2B;
+  --calcite-color-foreground-2: #202020;
+  --calcite-color-foreground-3: #131313;
+  --calcite-color-inverse: #D4D4D4;
+  --calcite-color-inverse-hover: #AAAAAA;
+  --calcite-color-inverse-press: #7F7F7F;
+  --calcite-color-border-1: #393939;
+  --calcite-color-border-2: #3F3F3F;
+  --calcite-color-border-3: #444444;
+  --calcite-color-border-input: #4A4A4A;
+  --calcite-ui-icon-color: currentColor;
+  --calcite-color-status-info: #0074B5;
   --calcite-color-status-success: #36DA43;
   --calcite-color-status-warning: #FFC900;
   --calcite-color-status-danger: #FE583E;
   --calcite-color-status-danger-hover: #FF0015;
   --calcite-color-status-danger-press: #D90012;
 }
+
+
 
 
 .calcite-mode-light {
@@ -98,6 +100,10 @@ html, body {
 .esri-widget--button {
   color: var(--calcite-color-text-1);
   background-color: var(--calcite-color-foreground-3);
+}
+
+.esri-legend {
+  width: unset !important;
 }
 
 /*
