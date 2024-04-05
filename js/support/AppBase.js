@@ -120,8 +120,8 @@ class AppBase extends AppConfig {
      * @param {Error|{name:string, message:string}} error
      */
     this.displayError = (error) => {
-      noticeTitleNode.innerHTML = error.name || 'Error';
-      noticeMessageNode.innerHTML = error.message || JSON.stringify(error, null, 2) || 'Something went wrong...';
+      noticeTitleNode.innerHTML = error.name || error.message || 'Error';
+      noticeMessageNode.innerHTML = error.details?.messages?.join("<br>") || error.message || JSON.stringify(error, null, 2) || 'Something went wrong...';
       appNotice.open = true;
       console.error(error);
     };
