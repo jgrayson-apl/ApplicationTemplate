@@ -21,13 +21,13 @@
  *
  * Author:   John Grayson - Applications Prototype Lab - Esri
  * Created:  8/30/2022 - 0.0.1 -
- * Modified:
+ * Modified: 4/12/2024 - 0.0.2 -
  *
  */
 
 class GlobeSpinner extends HTMLElement {
 
-  static version = '0.0.1';
+  static version = '0.0.2';
 
   /**
    * @enum {number}
@@ -108,6 +108,7 @@ class GlobeSpinner extends HTMLElement {
    */
   set disabled(value) {
     this.#disabled = value;
+    this.#disabled && this.setSpinState(GlobeSpinner.DIRECTION.NONE);
     this.actionPad.toggleAttribute('disabled', value);
   }
 
@@ -140,8 +141,7 @@ class GlobeSpinner extends HTMLElement {
 
     const shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.innerHTML = `
-      <style>
-        /*@import "https://js.arcgis.com/calcite-components/1.0.0-beta.86/calcite.css";*/
+      <style>        
         :host {          
           color: var(--calcite-color-brand);
           background-color: var(--calcite-color-foreground-2);
@@ -163,11 +163,11 @@ class GlobeSpinner extends HTMLElement {
         <calcite-action class="globe-spinner-direction-action globe-spinner-direction-right" icon="chevrons-right" scale="${ scale }" title="spin right"></calcite-action>            
         <calcite-dropdown title="spin options">
           <calcite-action slot="trigger" icon="gear" scale="s"></calcite-action>
-          <calcite-dropdown-group selection-mode="single" group-title="Spin Target">
+          <calcite-dropdown-group selection-mode="single" group-title="Target">
             <calcite-dropdown-item data-type="TARGET" data-target="CENTER" icon-start="globe" active>center</calcite-dropdown-item>
             <calcite-dropdown-item data-type="TARGET" data-target="SURFACE" icon-start="360-view">surface</calcite-dropdown-item>
           </calcite-dropdown-group>
-          <calcite-dropdown-group selection-mode="single" group-title="Spin Speed">
+          <calcite-dropdown-group selection-mode="single" group-title="Speed">
             <calcite-dropdown-item data-type="SPEED" data-speed="SLOWER">slower</calcite-dropdown-item>
             <calcite-dropdown-item data-type="SPEED" data-speed="NORMAL" active>normal</calcite-dropdown-item>
             <calcite-dropdown-item data-type="SPEED" data-speed="FASTER">faster</calcite-dropdown-item>
@@ -191,22 +191,22 @@ class GlobeSpinner extends HTMLElement {
     this.leftAction = this.shadowRoot.querySelector('calcite-action.globe-spinner-direction-left');
     this.leftAction.addEventListener('click', () => {
       const isActive = this.leftAction.toggleAttribute('active');
-      this._setSpinState(isActive ? GlobeSpinner.DIRECTION.LEFT : GlobeSpinner.DIRECTION.NONE);
+      this.setSpinState(isActive ? GlobeSpinner.DIRECTION.LEFT : GlobeSpinner.DIRECTION.NONE);
     });
 
     // RIGHT //
     this.rightAction = this.shadowRoot.querySelector('calcite-action.globe-spinner-direction-right');
     this.rightAction.addEventListener('click', () => {
       const isActive = this.rightAction.toggleAttribute('active');
-      this._setSpinState(isActive ? GlobeSpinner.DIRECTION.RIGHT : GlobeSpinner.DIRECTION.NONE);
+      this.setSpinState(isActive ? GlobeSpinner.DIRECTION.RIGHT : GlobeSpinner.DIRECTION.NONE);
     });
 
     // INITIAL UI SETTINGS //
-    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="CENTER"]').toggleAttribute('active', (this.#spinTarget === GlobeSpinner.TARGET.CENTER));
-    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="SURFACE"]').toggleAttribute('active', (this.#spinTarget === GlobeSpinner.TARGET.SURFACE));
-    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="SLOWER"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.SLOWER));
-    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="NORMAL"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.NORMAL));
-    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="FASTER"]').toggleAttribute('active', (this.#spinSpeed === GlobeSpinner.SPEED.FASTER));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="CENTER"]').toggleAttribute('selected', (this.#spinTarget === GlobeSpinner.TARGET.CENTER));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-target="SURFACE"]').toggleAttribute('selected', (this.#spinTarget === GlobeSpinner.TARGET.SURFACE));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="SLOWER"]').toggleAttribute('selected', (this.#spinSpeed === GlobeSpinner.SPEED.SLOWER));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="NORMAL"]').toggleAttribute('selected', (this.#spinSpeed === GlobeSpinner.SPEED.NORMAL));
+    this.shadowRoot.querySelector('calcite-dropdown-item[data-speed="FASTER"]').toggleAttribute('selected', (this.#spinSpeed === GlobeSpinner.SPEED.FASTER));
 
     // OPTIONS DROPDOWN - TARGET AND SPEED //
     const optionsDropdown = this.shadowRoot.querySelector('calcite-dropdown');
@@ -235,7 +235,7 @@ class GlobeSpinner extends HTMLElement {
     this._cancelSpin = this._cancelSpin.bind(this);
 
     // INITIAL SPIN //
-    this._setSpinState(this.#spinDirection);
+    this.setSpinState(this.#spinDirection);
 
   }
 
@@ -246,23 +246,22 @@ class GlobeSpinner extends HTMLElement {
 
   pause() {
     this.#previousState = this.#spinDirection;
-    this._setSpinState(GlobeSpinner.DIRECTION.NONE);
+    this.setSpinState(GlobeSpinner.DIRECTION.NONE);
   }
 
   /**
    *
    */
   resume() {
-    this.#previousState && this._setSpinState(this.#previousState);
+    this.#previousState && this.setSpinState(this.#previousState);
     this.#previousState = null;
   }
 
   /**
    *
    * @param {GlobeSpinner.DIRECTION} direction
-   * @private
    */
-  _setSpinState(direction) {
+  setSpinState(direction) {
 
     this.#spinDirection = direction || GlobeSpinner.DIRECTION.NONE;
 
@@ -278,6 +277,8 @@ class GlobeSpinner extends HTMLElement {
         this.#headingOffset = this.#spinSpeed;
         break;
       case GlobeSpinner.DIRECTION.NONE:
+        this.leftAction.toggleAttribute('active', false);
+        this.rightAction.toggleAttribute('active', false);
         break;
     }
 
