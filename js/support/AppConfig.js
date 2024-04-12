@@ -23,6 +23,9 @@
  * Modified:
  *
  */
+
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+
 class AppConfig extends EventTarget {
 
   static version = '0.0.1';
@@ -96,27 +99,25 @@ class AppConfig extends EventTarget {
    * @param view
    */
   initializeViewShareable({view}) {
-    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
-      if(view) {
+    if (view) {
 
-        if (this.shareable.includes('center')) {
-          reactiveUtils.watch(() => view.center, center => {
-            const {longitude, latitude} = center;
-            this.center = `${ longitude },${ latitude }`;
-          });
-        }
-
-        if (this.shareable.includes('zoom')) {
-          reactiveUtils.watch(() => view.zoom, zoom => {
-            this.zoom = zoom;
-          });
-        }
-
+      if (this.shareable.includes('center')) {
+        reactiveUtils.watch(() => view.center, center => {
+          const {longitude, latitude} = center;
+          this.center = `${ longitude },${ latitude }`;
+        });
       }
 
-      // REMOVE URL PARAMETERS //
-      //window.history.pushState({}, '', (window.location.origin + window.location.pathname));
-    });
+      if (this.shareable.includes('zoom')) {
+        reactiveUtils.watch(() => view.zoom, zoom => {
+          this.zoom = zoom;
+        });
+      }
+
+    }
+
+    // REMOVE URL PARAMETERS //
+    //window.history.pushState({}, '', (window.location.origin + window.location.pathname));
   }
 
   /**

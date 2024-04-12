@@ -23,8 +23,11 @@
  * Author:   John Grayson - Applications Prototype Lab - Esri
  * Created:  7/5/2022 - 0.0.1 -
  * Modified:
- *
+ * WebScene
  */
+
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+const WebScene = await $arcgis.import("esri/WebScene");
 
 class SlidesList extends HTMLElement {
 
@@ -80,8 +83,8 @@ class SlidesList extends HTMLElement {
           justify-content: flex-start; 
           min-width: 0;
           min-height: 0;                     
-          color: var(--calcite-ui-brand);
-          background-color: var(--calcite-ui-foreground-1) !important;          
+          color: var(--calcite-color-brand);
+          background-color: var(--calcite-color-foreground-1) !important;          
         }          
         :host calcite-list {   
           flex: 1 1 auto;                           
@@ -128,10 +131,8 @@ class SlidesList extends HTMLElement {
    * @private
    */
   _createSlidesFromItem({webSceneId}) {
-    require(['esri/WebScene'], (WebScene) => {
-      const webScene = new WebScene({portalItem: {id: webSceneId}});
-      this._createSlidesFromWebScene({webScene});
-    });
+    const webScene = new WebScene({portalItem: {id: webSceneId}});
+    this._createSlidesFromWebScene({webScene});
   }
 
   /**
@@ -181,14 +182,12 @@ class SlidesList extends HTMLElement {
    */
   goToSlide(slideTitle, goToOptions = {}) {
     return new Promise((resolve, reject) => {
-      require(["esri/core/reactiveUtils"], (reactiveUtils) => {
-        const goToSlide = this._slides.find(slide => slide.title.text === slideTitle);
-        if (goToSlide) {
-          reactiveUtils.whenOnce(() => !this._view.updating).then(() => {
-            this._view.goTo({target: goToSlide.viewpoint}, goToOptions).then(resolve).catch(reject);
-          });
-        } else { resolve(); }
-      });
+      const goToSlide = this._slides.find(slide => slide.title.text === slideTitle);
+      if (goToSlide) {
+        reactiveUtils.whenOnce(() => !this._view.updating).then(() => {
+          this._view.goTo({target: goToSlide.viewpoint}, goToOptions).then(resolve).catch(reject);
+        });
+      } else { resolve(); }
     });
   }
 

@@ -25,6 +25,8 @@
  *
  */
 
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+
 class MapScale extends HTMLElement {
 
   static version = '0.0.1';
@@ -86,18 +88,16 @@ class MapScale extends HTMLElement {
    *
    */
   connectedCallback() {
-    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
 
-      const scaleLabel = this.shadowRoot.querySelector('calcite-chip');
+    const scaleLabel = this.shadowRoot.querySelector('calcite-chip');
 
-      reactiveUtils.watch(() => this.view.scale, scale => {
-        scaleLabel.innerHTML = `1: ${ this.scaleFormatter.format(scale) }`;
-      }, {initial: true});
+    reactiveUtils.watch(() => this.view.scale, scale => {
+      scaleLabel.innerHTML = `1: ${ this.scaleFormatter.format(scale) }`;
+    }, {initial: true});
 
-      // LOADED //
-      requestAnimationFrame(() => { this.loaded = true; });
+    // LOADED //
+    requestAnimationFrame(() => { this.loaded = true; });
 
-    });
   }
 
   /**

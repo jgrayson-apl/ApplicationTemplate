@@ -25,6 +25,8 @@
  *
  */
 
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+
 class ViewLoading extends HTMLElement {
 
   static version = '0.0.1';
@@ -81,12 +83,10 @@ class ViewLoading extends HTMLElement {
    *
    */
   connectedCallback() {
-    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
-      this.view.when(() => {
-        this.loader = this.shadowRoot.querySelector('calcite-loader');
-        reactiveUtils.watch(() => this.view.updating, (updating) => {
-          this.#enabled && this.loader.toggleAttribute('hidden', !updating);
-        });
+    this.view.when(() => {
+      this.loader = this.shadowRoot.querySelector('calcite-loader');
+      reactiveUtils.watch(() => this.view.updating, (updating) => {
+        this.#enabled && this.loader.toggleAttribute('hidden', !updating);
       });
     });
   }

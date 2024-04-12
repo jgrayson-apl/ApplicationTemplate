@@ -143,9 +143,9 @@ class GlobeSpinner extends HTMLElement {
       <style>
         /*@import "https://js.arcgis.com/calcite-components/1.0.0-beta.86/calcite.css";*/
         :host {          
-          color: var(--calcite-ui-brand);
-          background-color: var(--calcite-ui-foreground-2);
-          border: solid 0.5pt var(--calcite-ui-border-2);                    
+          color: var(--calcite-color-brand);
+          background-color: var(--calcite-color-foreground-2);
+          border: solid 0.5pt var(--calcite-color-border-2);                    
         }
         :host calcite-action-pad[disabled] {
           pointer-events: none;
@@ -155,7 +155,7 @@ class GlobeSpinner extends HTMLElement {
           cursor: pointer;
         }        
         :host calcite-action.globe-spinner-direction-action[active] {         
-          --calcite-ui-icon-color: var(--calcite-ui-text-1);
+          --calcite-ui-icon-color: var(--calcite-color-text-1);
         }  
       </style>
       <calcite-action-pad expand-disabled layout="horizontal">

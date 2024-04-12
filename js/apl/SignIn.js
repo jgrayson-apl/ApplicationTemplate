@@ -25,6 +25,10 @@
  *
  */
 
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+const IdentityManager = await $arcgis.import("esri/identity/IdentityManager");
+const Portal = await $arcgis.import("esri/portal/Portal");
+
 class SignIn extends HTMLElement {
 
   static version = '0.0.1';
@@ -102,22 +106,19 @@ class SignIn extends HTMLElement {
    */
   initialize() {
     if (this.portal) {
-      require(['esri/identity/IdentityManager', 'esri/core/reactiveUtils'], (esriId, reactiveUtils) => {
 
-        this.userStatusBtn && this.userStatusBtn.addEventListener('click', this.userSignIn);
-        this.userSignOutItem && this.userSignOutItem.addEventListener('click', this.userSignOut);
+      this.userStatusBtn && this.userStatusBtn.addEventListener('click', this.userSignIn);
+      this.userSignOutItem && this.userSignOutItem.addEventListener('click', this.userSignOut);
 
-        reactiveUtils.watch(() => this.portal.user, (user) => {
-          this.updateUserUI().then(() => {
-            this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
-          }).catch(this.displayError);
-        }, {initial: true});
+      reactiveUtils.watch(() => this.portal.user, (user) => {
+        this.updateUserUI().then(() => {
+          this.dispatchEvent(new CustomEvent('user-change', {detail: {user: user}}));
+        }).catch(this.displayError);
+      }, {initial: true});
 
-        // CREDENTIAL CREATED //
-        esriId.on('credential-create', ({credential}) => {
-          credential ? this.userSignIn() : this.userSignOut();
-        });
-
+      // CREDENTIAL CREATED //
+      IdentityManager.on('credential-create', ({credential}) => {
+        credential ? this.userSignIn() : this.userSignOut();
       });
 
     } else {
@@ -182,13 +183,11 @@ class SignIn extends HTMLElement {
    */
   userSignIn() {
     return new Promise((resolve, reject) => {
-      require(['esri/portal/Portal'], (Portal) => {
-        const portal = new Portal({authMode: 'immediate'});
-        portal.load().then(() => {
-          this.portal = portal;
-          this.updateUserUI().then(resolve);
-        }).catch(reject).then();
-      });
+      const portal = new Portal({authMode: 'immediate'});
+      portal.load().then(() => {
+        this.portal = portal;
+        this.updateUserUI().then(resolve);
+      }).catch(reject).then();
     });
   };
 
@@ -198,11 +197,9 @@ class SignIn extends HTMLElement {
    */
   userSignOut() {
     return new Promise((resolve, reject) => {
-      require(['esri/identity/IdentityManager'], (IdentityManager) => {
-        IdentityManager.destroyCredentials();
-        this.portal && (this.portal.user = null);
-        this.updateUserUI().then(resolve);
-      });
+      IdentityManager.destroyCredentials();
+      this.portal && (this.portal.user = null);
+      this.updateUserUI().then(resolve);
     });
   };
 

@@ -28,6 +28,8 @@
  *
  */
 
+const Feature = await $arcgis.import("esri/widgets/Feature");
+
 class FeaturesList extends HTMLElement {
 
   static version = '0.0.1';
@@ -232,27 +234,23 @@ class FeaturesList extends HTMLElement {
    * @private
    */
   _updateDetails(detailsFeature) {
-    require([
-      'esri/core/reactiveUtils',
-      'esri/widgets/Feature'
-    ], (reactiveUtils, Feature) => {
 
-      const featureUI = new Feature({
-        container: document.createElement("div"),
-        view: this.view,
-        graphic: detailsFeature
-      });
-
-      const featureUICard = document.createElement("calcite-card");
-      featureUICard.style.setProperty('margin', '5px');
-      featureUICard.append(featureUI.container);
-
-      const detailsFlowItem = document.createElement("calcite-flow-item");
-      detailsFlowItem.setAttribute('heading', 'Details');
-      detailsFlowItem.append(featureUICard);
-
-      this.flowPanel.append(detailsFlowItem);
+    const featureUI = new Feature({
+      container: document.createElement("div"),
+      view: this.view,
+      graphic: detailsFeature
     });
+
+    const featureUICard = document.createElement("calcite-card");
+    featureUICard.style.setProperty('margin', '5px');
+    featureUICard.append(featureUI.container);
+
+    const detailsFlowItem = document.createElement("calcite-flow-item");
+    detailsFlowItem.setAttribute('heading', 'Details');
+    detailsFlowItem.append(featureUICard);
+
+    this.flowPanel.append(detailsFlowItem);
+
   }
 
   /**
@@ -360,3 +358,59 @@ class FeaturesList extends HTMLElement {
 customElements.define("apl-features-list", FeaturesList);
 
 export default FeaturesList;
+
+/*
+ this.displayFeatureList({view});
+ ====================
+ displayFeatureList({view}) {
+ if (view) {
+
+ const dateFormatter = new Intl.DateTimeFormat('default', {day: 'numeric', month: 'short', year: 'numeric'});
+ const acresFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+
+ // FEATURE LAYER //
+ const layerTitle = 'Current Perimeters';
+ const featureLayer = view.map.allLayers.find(layer => layer.title === layerTitle);
+ if (featureLayer) {
+ featureLayer.load().then(() => {
+ featureLayer.set({outFields: ["*"]});
+
+ // ENABLE TOGGLE ACTION //
+ document.querySelector('calcite-action[data-toggle="features-list"]').removeAttribute('hidden');
+
+ /!**
+ * GER FEATURE INFO CALLBACK
+ *
+ * @param {Graphic} feature
+ * @returns {{description: string, label: string, value: string}}
+ *!/
+
+ // FEATURES LIST //
+ const featuresList = new FeaturesList({
+ view,
+ container: 'feature-list-container',
+ featureLayer,
+ queryParams: {
+ where: '(IncidentName is not null)',
+ outFields: ['OBJECTID', 'IncidentName', 'FeatureCategory', 'GISAcres', 'DateCurrent'],
+ orderByFields: ['DateCurrent DESC']
+ },
+ getFeatureInfoCallback: (feature) => {
+ return {
+ value: String(feature.getObjectId()),
+ label: `${ feature.attributes.IncidentName }`,
+ description: `${ dateFormatter.format(new Date(feature.attributes.DateCurrent)) } | Acres: ${ acresFormatter.format(feature.attributes.GISAcres) }`
+ };
+ }
+ });
+
+ });
+ } else {
+ this.displayError({
+ name: `Can't Find Layer`,
+ message: `The layer '${ layerTitle }' can't be found in this map.`
+ });
+ }
+
+ }
+ }*/

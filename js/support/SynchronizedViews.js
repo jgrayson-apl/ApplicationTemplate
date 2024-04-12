@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
+
 export default class SynchronizedViews {
 
   _views;
@@ -41,16 +43,12 @@ export default class SynchronizedViews {
    * @param views
    */
   constructor({views}) {
-    // REACTIVE UTILS //
-    require(['esri/core/reactiveUtils'], (reactiveUtils) => {
-      this.reactiveUtils = reactiveUtils;
 
-      this._views = views;
-      this.syncType = (this._views && (this._views.length > 0))
-        ? SynchronizedViews.SYNC_TYPE.LOCATION_AND_SCALE
-        : SynchronizedViews.SYNC_TYPE.NONE;
+    this._views = views;
+    this.syncType = (this._views && (this._views.length > 0))
+      ? SynchronizedViews.SYNC_TYPE.LOCATION_AND_SCALE
+      : SynchronizedViews.SYNC_TYPE.NONE;
 
-    });
   }
 
   /**
@@ -155,13 +153,13 @@ export default class SynchronizedViews {
 
       // stop as soon as another view starts interacting, like if the user starts panning
       otherInteractHandlers = others.reduce((list, otherView) => {
-        const interacting = this.reactiveUtils.when(() => otherView.interacting, (value) => (value && clear()));
-        const animation = this.reactiveUtils.when(() => otherView.animation, (value) => (value && clear()));
+        const interacting = reactiveUtils.when(() => otherView.interacting, (value) => (value && clear()));
+        const animation = reactiveUtils.when(() => otherView.animation, (value) => (value && clear()));
         return list.concat(interacting, animation);
       }, []);
 
       // or stop when the view is stationary again
-      viewStationaryHandle = this.reactiveUtils.when(() => view.stationary, clear);
+      viewStationaryHandle = reactiveUtils.when(() => view.stationary, clear);
     });
 
     return {

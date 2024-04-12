@@ -14,6 +14,8 @@
  limitations under the License.
  */
 
+const esriConfig = await $arcgis.import("esri/config");
+
 import GroupLoader from "./GroupLoader.js";
 import MapLoader from "./MapLoader.js";
 import ViewLoader from "./ViewLoader.js";
@@ -59,85 +61,85 @@ class AppLoader {
    * @private
    */
   _load() {
-    return new Promise((resolve, reject) => {
-      // ESRI CONFIG //
-      require(['esri/config'], (esriConfig) => {
+    return new Promise(async (resolve, reject) => {
 
-        // CLEAR ERROR MESSAGE //
-        this.app.clearError();
+      // CLEAR ERROR MESSAGE //
+      this.app.clearError();
 
-        // SIGN IN MESSAGE //
-        let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
+      // SIGN IN MESSAGE //
+      let signInMessage = `Application created on ${ (new Date()).toLocaleString() }`;
 
-        // REQUIRES AUTHENTICATION //
-        let requiresAuthentication = false;
+      // REQUIRES AUTHENTICATION //
+      let requiresAuthentication = false;
 
-        // PORTAL URL //
-        if (this.app?.portalUrl) {
-          esriConfig.portalUrl = this.app.portalUrl;
-        }
+      // PORTAL URL //
+      if (this.app?.portalUrl) {
+        esriConfig.portalUrl = this.app.portalUrl;
+      }
+
+      //
+      // API KEY //
+      //
+      if (this.app?.apiKey) {
+        requiresAuthentication = true;
+
+        // CONFIGURE APIKEY //
+        esriConfig.apiKey = this.app.apiKey;
+
+        // LOAD PORTAL //
+        this._loadPortal().then(() => {
+          signInMessage = `Application created via API key. [ ${ (new Date()).toLocaleString() } ]`;
+          resolve(signInMessage);
+        }).catch(reject);
+
+      } else {
+        const IdentityManager = await $arcgis.import("esri/identity/IdentityManager");
+        const OAuthInfo = await $arcgis.import("esri/identity/OAuthInfo");
+
+        // SHARING URL //
+        const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
 
         //
-        // API KEY //
+        // OAUTH //
         //
-        if (this.app?.apiKey) {
+        if (this.app?.oauthappid) {
           requiresAuthentication = true;
+          signInMessage = `Application created via OAuth. [ ${ (new Date()).toLocaleString() } ]`;
 
-          // CONFIGURE APIKEY //
-          esriConfig.apiKey = this.app.apiKey;
-
-          // LOAD PORTAL //
-          this._loadPortal().then(() => {
-            signInMessage = `Application created via API key. [ ${ (new Date()).toLocaleString() } ]`;
-            resolve(signInMessage);
-          }).catch(reject);
-
-        } else {
-          require(['esri/identity/IdentityManager', 'esri/identity/OAuthInfo'], (esriId, OAuthInfo) => {
-            // SHARING URL //
-            const portalSharingURL = `${ esriConfig.portalUrl }/sharing`;
-
-            //
-            // OAUTH //
-            //
-            if (this.app?.oauthappid) {
-              requiresAuthentication = true;
-              signInMessage = `Application created via OAuth. [ ${ (new Date()).toLocaleString() } ]`;
-
-              // CONFIGURE OAUTH //
-              const oauthInfo = new OAuthInfo({
-                portalUrl: esriConfig.portalUrl,
-                appId: this.app.oauthappid,
-                popup: true
-              });
-              esriId.registerOAuthInfos([oauthInfo]);
-            }
-
-            // CHECK SIGN-IN STATUS //
-            esriId.checkSignInStatus(portalSharingURL).then(() => {
-              return esriId.getCredential(portalSharingURL);
-            }).catch((error) => {
-              requiresAuthentication && (this.app.authMode = 'immediate');
-            }).then(() => {
-              //
-              // LOAD PORTAL //
-              //
-              this._loadPortal().then(() => {
-                resolve(signInMessage);
-              }).catch((error) => {
-
-                // TODO: MORE RESEARCH NEEDED //
-                // esriId.destroyCredentials();
-                // this.app.displayError({name: "Loading Error...", message: error.message});
-                // this._load().then(resolve).catch(reject);
-
-              });
-            });
+          // CONFIGURE OAUTH //
+          const oauthInfo = new OAuthInfo({
+            portalUrl: esriConfig.portalUrl,
+            appId: this.app.oauthappid,
+            authNamespace: "portal_oauth_inline",
+            popup: true
           });
+          IdentityManager.registerOAuthInfos([oauthInfo]);
         }
-      });
 
+        // CHECK SIGN-IN STATUS //
+        IdentityManager.checkSignInStatus(portalSharingURL).then(() => {
+          return IdentityManager.getCredential(portalSharingURL);
+        }).catch((error) => {
+          requiresAuthentication && (this.app.authMode = 'immediate');
+        }).then(() => {
+          //
+          // LOAD PORTAL //
+          //
+          this._loadPortal().then(() => {
+            resolve(signInMessage);
+          }).catch((error) => {
+
+            // TODO: MORE RESEARCH NEEDED //
+            // esriId.destroyCredentials();
+            // this.app.displayError({name: "Loading Error...", message: error.message});
+            // this._load().then(resolve).catch(reject);
+
+          });
+        });
+
+      }
     });
+
   }
 
   /**
@@ -146,23 +148,24 @@ class AppLoader {
    * @returns {Promise}
    * @private
    */
-  _loadPortal(params = {}) {
-    return new Promise((resolve, reject) => {
-      require(['esri/portal/Portal'], (Portal) => {
-        // CREATE PORTAL //
-        const portal = new Portal({authMode: this.app?.authMode || 'auto', ...params});
-        // LOAD PORTAL //
-        portal.load().then(() => {
-          Promise.all([
-            this._loadGroup(portal),
-            this._loadMap()
-          ]).then(() => {
-            this.portal = portal;
-            resolve();
-          }).catch(reject);
+   _loadPortal(params = {}) {
+    return new Promise(async (resolve, reject) => {
+
+      // CREATE PORTAL //
+      const Portal = await $arcgis.import("esri/portal/Portal");
+      const portal = new Portal({authMode: this.app?.authMode || 'auto', ...params});
+      // LOAD PORTAL //
+      portal.load().then(() => {
+        Promise.all([
+          this._loadGroup(portal),
+          this._loadMap()
+        ]).then(() => {
+          this.portal = portal;
+          resolve();
         }).catch(reject);
-      });
+      }).catch(reject);
     });
+
   }
 
   /**
