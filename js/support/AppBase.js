@@ -98,7 +98,7 @@ class AppBase extends AppConfig {
    * LOAD APP CONFIG
    *
    * @param {string|null} configPath
-   * @returns {Promise<unknown>}
+   * @returns {Promise<{}>}
    */
   async load(configPath = null) {
     return new Promise((resolve, reject) => {

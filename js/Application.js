@@ -14,6 +14,7 @@
  limitations under the License.
  */
 
+//const promiseUtils = await $arcgis.import("esri/core/promiseUtils");
 const reactiveUtils = await $arcgis.import("esri/core/reactiveUtils");
 
 import AppBase from "./support/AppBase.js";
@@ -24,9 +25,14 @@ import MapScale from './apl/MapScale.js';
 
 class Application extends AppBase {
 
-  // PORTAL //
+  /**
+   * @type {Portal}
+   */
   portal;
 
+  /**
+   *
+   */
   constructor() {
     super();
 
@@ -140,7 +146,7 @@ class Application extends AppBase {
         const Legend = await $arcgis.import("esri/widgets/Legend");
         const legend = new Legend({
           container: 'legend-container',
-          view: view  //basemapLegendVisible: true
+          view: view
         });
         //view.ui.add(legend, {position: 'bottom-left', index: 0});
 
